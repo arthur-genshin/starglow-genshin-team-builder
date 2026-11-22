@@ -2105,7 +2105,10 @@ const stamp = new Date(updatedAt).toLocaleString();
   : info.profilePicture?.id
     ? String(info.profilePicture.id)
     : '';
-    const character = DATA.profileAvatarIds[pictureId];
+const character = DATA.profileAvatarIds[pictureId] ||
+  (pictureId === '9400'
+    ? DATA.characters.find(item => item.name === 'Yumemizuki Mizuki')
+    : null);
     $('#profileName').textContent = name;
     $('#profileUid').textContent = uid ? `UID ${uid}` : 'UID NOT CONNECTED';
     $('#profileSignature').textContent = `“${signature}”`;
