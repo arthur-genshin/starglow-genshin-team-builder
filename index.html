@@ -1,0 +1,2435 @@
+<!DOCTYPE html>
+<html lang="en" data-mode="dark" data-accent="fontaine">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#101116" />
+  <meta name="description" content="Starglow — build better Genshin Impact teams from the characters you own." />
+  <title>Starglow — Teyvat Team Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+:root {
+  --bg: #101116;
+  --bg-deep: #0b0c10;
+  --surface: rgba(27, 29, 38, .88);
+  --surface-2: #20222c;
+  --surface-3: #292c38;
+  --text: #f0f0f2;
+  --muted: #9b9eaa;
+  --muted-2: #747887;
+  --line: rgba(255,255,255,.09);
+  --accent: #77c8d5;
+  --accent-rgb: 119, 200, 213;
+  --accent-soft: rgba(var(--accent-rgb), .13);
+  --accent-glow: rgba(var(--accent-rgb), .24);
+  --gold: #dcbf84;
+  --danger: #dc8b8b;
+  --shadow: 0 22px 70px rgba(0,0,0,.24);
+  color-scheme: dark;
+}
+html[data-mode="light"] {
+  --bg: #f1f0ed;
+  --bg-deep: #e7e5e0;
+  --surface: rgba(255,255,255,.88);
+  --surface-2: #fff;
+  --surface-3: #eeede9;
+  --text: #20222a;
+  --muted: #686c78;
+  --muted-2: #858995;
+  --line: rgba(31,34,45,.12);
+  --shadow: 0 22px 70px rgba(34,36,45,.09);
+  color-scheme: light;
+}
+html[data-accent="mondstadt"] { --accent:#9bc9ae; --accent-rgb:155,201,174; }
+html[data-accent="liyue"] { --accent:#d7ad68; --accent-rgb:215,173,104; }
+html[data-accent="inazuma"] { --accent:#b4a0e3; --accent-rgb:180,160,227; }
+html[data-accent="sumeru"] { --accent:#95c98a; --accent-rgb:149,201,138; }
+html[data-accent="fontaine"] { --accent:#77c8d5; --accent-rgb:119,200,213; }
+html[data-accent="natlan"] { --accent:#e58a75; --accent-rgb:229,138,117; }
+html[data-accent="snezhnaya"] { --accent:#a4c4e8; --accent-rgb:164,196,232; }
+html[data-accent="khaenriah"] { --accent:#9ca9d8; --accent-rgb:156,169,216; }
+* { box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { margin:0; min-width:320px; background:radial-gradient(ellipse at 12% 0%, rgba(var(--accent-rgb),.10), transparent 35%), var(--bg); color:var(--text); font-family:"DM Sans",sans-serif; transition:background .25s,color .25s; }
+button,input,select { font:inherit; }
+button { cursor:pointer; }
+button:focus-visible,input:focus-visible,select:focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
+.ambient { position:fixed; pointer-events:none; z-index:-1; border-radius:50%; filter:blur(80px); opacity:.12; }
+.ambient-one { width:380px;height:380px;right:-190px;top:200px;background:var(--accent); }
+.ambient-two { width:260px;height:260px;left:-160px;bottom:5%;background:#9b86d4;opacity:.08; }
+.app-shell { max-width:1540px; padding:0 48px; margin:auto; }
+.topbar { display:flex; align-items:center; justify-content:space-between; min-height:88px; border-bottom:1px solid var(--line); gap:28px; }
+.brand { display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--text);min-width:220px; }
+.brand-mark { width:39px;height:39px;border:1px solid rgba(var(--accent-rgb),.55);border-radius:13px;display:grid;place-items:center;color:var(--accent);background:var(--accent-soft);font-size:21px;box-shadow:0 0 24px var(--accent-glow); }
+.brand-copy { display:flex;flex-direction:column;gap:3px;letter-spacing:.15em; }
+.brand-copy strong { font:800 13px "Manrope",sans-serif; }
+.brand-copy small { color:var(--muted);font-size:8px;letter-spacing:.22em; }
+.main-nav { display:flex;align-items:center;gap:8px; }
+.nav-link { border:0;background:transparent;color:var(--muted);padding:11px 16px;border-radius:10px;font-size:13px;font-weight:600;transition:.2s; }
+.nav-link:hover,.nav-link.active { color:var(--text);background:var(--surface-2); }
+.nav-link.active { box-shadow:inset 0 -2px var(--accent); }
+.topbar-right { display:flex;align-items:center;gap:17px;min-width:220px;justify-content:flex-end; }
+.wallet { display:flex;align-items:center;gap:7px;color:var(--gold);font-size:12px; }
+.wallet strong { color:var(--text);font-size:13px; }
+.wallet small { color:var(--muted);font-size:8px;letter-spacing:.13em; }
+.gem-icon { font-size:19px; }
+.avatar-mini { width:36px;height:36px;border-radius:50%;border:1px solid rgba(var(--accent-rgb),.55);background:linear-gradient(145deg,var(--accent-soft),var(--surface-2));color:var(--accent);font-weight:800; }
+main { min-height:calc(100vh - 170px); }
+.view { display:none;padding:44px 0 66px;animation:rise .32s ease both; }
+.view.active { display:block; }
+@keyframes rise { from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)} }
+.hero-row { display:flex;align-items:flex-end;justify-content:space-between;gap:32px;margin-bottom:34px; }
+.eyebrow,.section-kicker { color:var(--accent);font-size:9px;font-weight:800;letter-spacing:.2em;text-transform:uppercase; }
+.eyebrow { display:flex;align-items:center;gap:10px;margin-bottom:14px; }
+.eyebrow-line { display:inline-block;width:24px;height:1px;background:var(--accent); }
+h1,h2,h3,p { margin-top:0; }
+h1 { font:800 clamp(38px,5vw,61px)/1.06 "Manrope",sans-serif;letter-spacing:-.055em;margin-bottom:14px; }
+h1 em { color:var(--accent);font-style:normal; }
+.hero-subtitle,.page-heading p { max-width:570px;color:var(--muted);font-size:14px;line-height:1.7;margin-bottom:0; }
+.hero-note { display:flex;align-items:center;gap:13px;padding:15px 18px;border:1px solid var(--line);background:var(--surface);border-radius:14px;min-width:285px;margin-bottom:8px; }
+.note-star { display:grid;place-items:center;width:36px;height:36px;border-radius:11px;color:var(--accent);background:var(--accent-soft);font-size:20px; }
+.hero-note div { display:flex;flex-direction:column;gap:4px; }
+.hero-note strong { font-size:11px; }
+.hero-note small { color:var(--muted);font-size:10px; }
+.workspace-grid { display:grid;grid-template-columns:minmax(0,1.1fr) minmax(390px,.9fr);gap:20px;align-items:start; }
+.panel { background:var(--surface);border:1px solid var(--line);border-radius:17px;box-shadow:var(--shadow);backdrop-filter:blur(18px); }
+.roster-panel,.builder-panel,.result-panel,.profile-connect-panel,.appearance-panel { padding:23px; }
+.panel-heading { display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:18px; }
+.panel-heading h2,.shop-heading h2 { font:750 20px "Manrope",sans-serif;letter-spacing:-.035em;margin:6px 0 0; }
+.count-pill { background:var(--accent-soft);border:1px solid rgba(var(--accent-rgb),.25);color:var(--accent);border-radius:50px;padding:7px 11px;font-size:10px;white-space:nowrap; }
+.count-pill strong { font-size:13px;margin-right:3px; }
+.catalog-sync { display:flex;align-items:center;gap:11px;padding:12px 13px;margin:-3px 0 15px;border:1px solid rgba(var(--accent-rgb),.2);border-radius:12px;background:linear-gradient(110deg,var(--accent-soft),transparent 85%); }
+.catalog-sync-mark { display:grid;place-items:center;width:34px;height:34px;flex:none;border-radius:10px;background:var(--surface-2);color:var(--accent);font-size:19px; }
+.catalog-sync-copy { display:flex;flex-direction:column;gap:4px;flex:1;min-width:0; }
+.catalog-sync-copy strong { font-size:10px; }
+.catalog-sync-copy small { color:var(--muted);font-size:8px;line-height:1.45; }
+.catalog-sync-actions { display:flex;align-items:center;gap:7px;flex:none; }
+.catalog-sync .button { padding:9px 11px;white-space:nowrap; }
+
+.editorial-view .page-heading { margin-bottom:27px; }
+.editorial-grid { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:17px; }
+.editorial-card { padding:25px; }
+.editorial-card h2,.about-card h2 { font:750 clamp(20px,2.4vw,27px)/1.2 "Manrope",sans-serif;letter-spacing:-.035em;margin:11px 0 13px; }
+.editorial-card p,.about-card p { color:var(--muted);font-size:13px;line-height:1.8;margin:0 0 12px; }
+.editorial-feature { grid-column:1/-1;background:linear-gradient(125deg,var(--accent-soft),var(--surface) 68%); }
+.editorial-takeaway { margin-top:18px;padding:14px 16px;border-left:2px solid var(--accent);background:var(--surface-2);border-radius:0 10px 10px 0;color:var(--muted);font-size:12px;line-height:1.7; }
+.editorial-takeaway strong { color:var(--text); }
+.editorial-footnote { color:var(--muted-2);font-size:10px;line-height:1.6;margin:17px 2px 0; }
+.about-card { max-width:850px;margin:0 auto;padding:clamp(24px,5vw,48px); }
+.about-mark { width:52px;height:52px;display:grid;place-items:center;border-radius:16px;background:var(--accent-soft);color:var(--accent);font-size:28px;margin-bottom:23px; }
+.about-card h2 { font-size:clamp(27px,4vw,38px);margin:12px 0 18px; }
+.about-card p { font-size:14px;line-height:1.9;margin-bottom:15px; }
+.about-signoff { margin-top:23px!important;color:var(--text)!important; }
+.about-signature { display:flex;flex-direction:column;gap:3px;margin-top:22px;font:700 18px "Manrope",sans-serif;color:var(--accent); }
+.about-signature span { font:500 10px "DM Sans",sans-serif;color:var(--muted);letter-spacing:.08em;text-transform:uppercase; }
+.about-contact { margin-top:25px;padding:17px 19px;border:1px solid var(--line);border-radius:14px;background:var(--surface-2);display:flex;flex-direction:column;gap:6px; }
+.about-contact strong { font:700 11px "Manrope",sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--text); }
+.about-contact p { margin:0;color:var(--muted);font-size:12px; }
+.about-contact a { color:var(--accent);font-weight:700;text-decoration:none;overflow-wrap:anywhere; }
+.about-contact a:hover { text-decoration:underline; }
+@media(max-width:1050px) { .topbar { gap:12px; }.brand { min-width:165px; }.topbar-right { min-width:auto; }.main-nav { gap:2px; }.nav-link { padding:10px 9px;font-size:12px; } }
+@media(max-width:850px) { .editorial-grid { grid-template-columns:1fr; }.editorial-feature { grid-column:auto; } }
+@media(max-width:650px) { .main-nav { order:3;width:100%;justify-content:center;gap:2px;flex-wrap:wrap; }.nav-link { flex:1 1 28%;padding:9px 5px;font-size:10px; } }
+
+@media (max-width:850px) { .catalog-sync-actions { width:100%; } .catalog-sync-actions .button { flex:1; } }
+.catalog-source { color:var(--muted-2);font-size:8px;margin:-8px 0 14px;line-height:1.5; }
+.catalog-source a { color:var(--accent);text-decoration:none; }
+.catalog-source a:hover { text-decoration:underline; }
+.import-box { display:grid;grid-template-columns:42px minmax(0,1fr);gap:9px 13px;align-items:center;border:1px dashed rgba(var(--accent-rgb),.35);background:linear-gradient(120deg,var(--accent-soft),transparent 75%);border-radius:13px;padding:14px;margin-bottom:17px; }
+.import-symbol { width:37px;height:37px;border-radius:11px;display:grid;place-items:center;background:var(--surface-2);color:var(--accent);font-size:23px; }
+.import-copy { display:flex;flex-direction:column;gap:4px;min-width:0; }
+.import-copy strong { font-size:11px; }
+.import-copy small { color:var(--muted);font-size:9px;line-height:1.5; }
+.import-scan-warning { grid-column:1 / -1;display:flex;align-items:flex-start;gap:9px;padding:10px 12px;border:1px solid rgba(224,164,70,.38);border-radius:10px;background:rgba(224,164,70,.09);color:var(--text);font-size:9px;line-height:1.55; }
+.import-scan-warning strong { color:#d69a3b; }
+.import-scan-warning .warning-icon { flex:none;font-size:14px;line-height:1.2; }
+.import-controls { grid-column:1 / -1;display:flex;align-items:center;gap:10px;min-width:0; }
+.file-list { color:var(--muted);font-size:9px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:1 1 120px; }
+.micro-hint { color:var(--muted-2);font-size:9px;line-height:1.5;margin:7px 0 0; }
+
+.import-box .upload-button { white-space:nowrap;justify-self:start; }
+.import-box .micro-hint { grid-column:1 / -1; }
+.portrait-scan-panel { grid-column:1 / -1; padding:12px; border:1px solid var(--line); border-radius:12px; background:var(--surface-2); display:grid; gap:10px; }
+.portrait-scan-panel[hidden] { display:none; }
+.portrait-scan-heading { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.portrait-scan-heading strong { font-size:10px; }
+.portrait-scan-heading small { display:block; color:var(--muted); font-size:8px; margin-top:3px; }
+.portrait-preview-wrap { width:100%; max-height:430px; overflow:auto; border:1px solid var(--line); border-radius:10px; background:#090a0e; }
+#portraitPreviewCanvas { display:block; width:100%; height:auto; max-height:430px; object-fit:contain; cursor:crosshair; touch-action:none; }
+.portrait-grid-controls { display:flex; align-items:end; gap:9px; flex-wrap:wrap; }
+.portrait-grid-controls label { display:grid; gap:5px; color:var(--muted); font-size:8px; }
+.portrait-grid-controls select { min-width:82px; }
+.portrait-grid-note { color:var(--muted-2); font-size:8px; line-height:1.5; margin:0; }
+.portrait-scan-results { grid-column:1 / -1; display:flex; flex-wrap:wrap; gap:6px; }
+.portrait-scan-results[hidden] { display:none; }
+.portrait-match-chip { display:inline-flex; gap:5px; align-items:center; padding:5px 8px; border:1px solid rgba(var(--accent-rgb),.25); border-radius:50px; color:var(--text); font-size:8px; background:var(--accent-soft); }
+.portrait-match-chip small { color:var(--muted); }
+.portrait-result-group,.portrait-review-group { display:grid;gap:7px;width:100%; }
+.portrait-result-group > div { display:flex;flex-wrap:wrap;gap:6px; }
+.portrait-review-group { border-top:1px solid var(--line);padding-top:9px;margin-top:2px; }
+.portrait-review-group > strong,.portrait-result-group > strong { color:var(--text);font-size:9px; }
+.portrait-review-group > small { color:var(--muted);font-size:8px;line-height:1.5; }
+.portrait-review-row { display:flex;align-items:center;justify-content:space-between;gap:9px;padding:7px 9px;border:1px solid var(--line);border-radius:9px;background:var(--surface-2); }
+.portrait-review-row > span { min-width:0;display:flex;flex-direction:column;gap:3px; }
+.portrait-review-row b { color:var(--text);font-size:9px; }
+.portrait-review-row small { color:var(--muted);font-size:7px;line-height:1.4; }
+.portrait-review-row .button { flex:none;padding:6px 10px;font-size:8px; }
+.portrait-review-options { display:flex;align-items:center;justify-content:flex-end;gap:6px;max-width:100%;min-width:min(100%,270px); }
+.portrait-choice-preview { width:42px;height:48px;object-fit:contain;flex:none;border:1px solid var(--line);border-radius:7px;background:var(--surface);padding:2px; }
+.portrait-choice-picker { position:relative;flex:1;min-width:0; }
+.portrait-choice-picker > summary { list-style:none;display:flex;align-items:center;gap:7px;min-width:0;padding:5px 8px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--text);font:inherit;font-size:9px;cursor:pointer; }
+.portrait-choice-picker > summary::-webkit-details-marker { display:none; }
+.portrait-choice-picker > summary img { width:32px;height:36px;object-fit:contain;border-radius:5px;background:var(--surface-2);flex:none; }
+.portrait-choice-picker > summary span { min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1; }
+.portrait-choice-list { position:absolute;z-index:30;top:calc(100% + 5px);left:0;right:0;max-height:310px;overflow:auto;padding:5px;border:1px solid var(--line);border-radius:10px;background:var(--surface);box-shadow:0 12px 30px rgba(0,0,0,.24);display:grid;gap:3px; }
+.portrait-choice-option { width:100%;display:flex;align-items:center;gap:8px;text-align:left;padding:5px;border:1px solid transparent;border-radius:7px;background:transparent;color:var(--text);cursor:pointer; }
+.portrait-choice-option:hover,.portrait-choice-option[aria-selected=true] { border-color:rgba(var(--accent-rgb),.45);background:var(--accent-soft); }
+.portrait-choice-option img { width:38px;height:42px;object-fit:contain;border-radius:6px;background:var(--surface-2);flex:none; }
+.portrait-choice-option span { min-width:0;flex:1;font-size:9px;font-weight:700; }
+.portrait-choice-option small { display:block;color:var(--muted);font-size:8px;font-weight:500;margin-top:2px; }
+.portrait-choice-picker select { display:none; }
+.portrait-review-options .button { white-space:nowrap; }
+@media(max-width:560px){.portrait-review-row{align-items:stretch;flex-direction:column}.portrait-review-options{justify-content:stretch}.portrait-choice-picker{min-width:0}}
+
+
+.character-art img,.main-preview-art img,.profile-avatar-art img { width:100%; height:100%; object-fit:contain; }
+/* Forward-facing avatar artwork has transparent space around the head; do not crop it like splash art. */
+.character-card .character-art img { object-fit:contain; padding:2px; }
+.profile-avatar-art { width:100%; height:100%; border-radius:50%; overflow:hidden; }
+.character-fallback { width:100%;height:100%;display:grid;place-items:center;background:linear-gradient(145deg,var(--accent-soft),var(--surface-3));color:var(--accent);font:800 20px Manrope,sans-serif; }
+
+.button { border:1px solid transparent;border-radius:9px;padding:10px 14px;font-size:10px;font-weight:800;transition:transform .18s,background .18s,border .18s;white-space:nowrap; }
+.button:hover:not(:disabled) { transform:translateY(-1px); }
+.button:disabled { opacity:.45;cursor:not-allowed; }
+.button-outline { color:var(--accent);border-color:rgba(var(--accent-rgb),.35);background:transparent; }
+.button-outline:hover { background:var(--accent-soft); }
+.button-soft { color:var(--text);background:var(--surface-3);border-color:var(--line); }
+.button-primary { color:#11151a;background:var(--accent);box-shadow:0 7px 22px var(--accent-glow); }
+html[data-mode="light"] .button-primary { color:#fff; }
+.upload-button { display:inline-flex;align-items:center;justify-content:center;justify-self:end;min-width:132px;min-height:38px;padding:9px 14px;box-sizing:border-box;flex:none;line-height:1.2;text-align:center; }
+.scan-progress { display:flex;align-items:center;gap:10px;grid-column:1/-1;color:var(--muted);font-size:9px; }
+.progress-track { flex:1;height:4px;background:var(--surface-3);border-radius:10px;overflow:hidden; }
+.progress-track i { display:block;width:0;height:100%;background:var(--accent);transition:width .2s; }
+.roster-tools { display:flex;align-items:center;gap:9px;margin-bottom:14px; }
+.search-box { display:flex;align-items:center;gap:8px;flex:1;min-width:100px;background:var(--surface-2);border:1px solid var(--line);border-radius:9px;padding:0 10px;height:36px;color:var(--muted); }
+.search-box span { font-size:18px; }
+.search-box input { width:100%;min-width:0;border:0;outline:0;background:transparent;color:var(--text);font-size:10px; }
+.filter-select,.main-select,.uid-row input { background:var(--surface-2);border:1px solid var(--line);color:var(--text);border-radius:9px;padding:10px;font-size:10px; }
+.filter-select { max-width:130px; }
+.owned-toggle { display:flex;align-items:center;gap:6px;color:var(--muted);font-size:9px;white-space:nowrap; }
+.owned-toggle input { accent-color:var(--accent); }
+.character-grid { display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;min-height:165px; }
+.character-card { position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0;padding:9px 5px 8px;border:1px solid var(--line);border-radius:11px;background:var(--surface-2);color:var(--text);transition:.18s;text-align:center; }
+.character-card:hover { transform:translateY(-2px);border-color:rgba(var(--accent-rgb),.45); }
+.character-card.owned { border-color:rgba(var(--accent-rgb),.65);background:linear-gradient(155deg,var(--accent-soft),var(--surface-2) 70%); }
+.character-card .character-art { width:50px;height:50px;border-radius:13px;display:grid;place-items:center;background:var(--surface-3);overflow:hidden;border:1px solid var(--line); }
+.character-card img { width:100%;height:100%;object-fit:cover; }
+.character-fallback { font:800 17px "Manrope",sans-serif;color:var(--accent); }
+.character-card strong { width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:9px; }
+.character-card small { color:var(--muted);font-size:8px; }
+.character-card .owned-check { position:absolute;right:6px;top:5px;color:var(--accent);font-size:11px;opacity:0; }
+.character-card.owned .owned-check { opacity:1; }
+  .traveler-card { position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0;padding:9px 5px 8px;border:1px solid var(--line);border-radius:11px;background:var(--surface-2);text-align:center; }
+  .traveler-card.owned { border-color:rgba(var(--accent-rgb),.65);background:linear-gradient(155deg,var(--accent-soft),var(--surface-2) 70%); }
+  .traveler-card .traveler-pick { width:100%;display:flex;flex-direction:column;gap:3px; }
+  .traveler-card select { width:100%;min-width:0;padding:5px 3px;border:1px solid var(--line);border-radius:7px;background:var(--surface-3);color:var(--text);font-size:9px; }
+  .traveler-card .traveler-toggle { width:100%;border:0;background:transparent;color:var(--text);display:flex;flex-direction:column;align-items:center;gap:5px;padding:0;cursor:pointer; }
+  .traveler-card .traveler-toggle strong { font-size:9px; }
+  .traveler-card .traveler-toggle small { color:var(--muted);font-size:8px; }
+.roster-footer { display:flex;align-items:center;justify-content:space-between;gap:12px;border-top:1px solid var(--line);margin-top:14px;padding-top:12px;color:var(--muted-2);font-size:9px; }
+.text-button { border:0;background:transparent;color:var(--accent);font-size:9px;font-weight:700;padding:5px; }
+.right-column { display:grid;gap:20px; }
+.compact-heading { margin-bottom:17px; }
+.sparkle-badge,.result-status,.loop-label { border:1px solid rgba(var(--accent-rgb),.25);background:var(--accent-soft);border-radius:50px;color:var(--accent);padding:6px 9px;font-size:8px;font-weight:800;letter-spacing:.08em;white-space:nowrap; }
+.field-label { display:block;color:var(--muted);font-size:9px;font-weight:700;letter-spacing:.08em;margin-bottom:8px;text-transform:uppercase; }
+.main-select { width:100%;height:43px;font-size:11px; }
+.main-preview { display:flex;align-items:center;gap:12px;min-height:69px;background:var(--surface-2);border:1px solid var(--line);border-radius:11px;padding:10px 13px;margin-top:12px; }
+.main-preview strong,.main-preview small { display:block; }
+.main-preview strong { font-size:11px;margin-bottom:4px; }
+.main-preview small { font-size:9px;color:var(--muted); }
+.main-preview-orbit { width:42px;height:42px;border-radius:12px;background:var(--accent-soft);display:grid;place-items:center;color:var(--accent);font-size:22px;flex:none; }
+.main-preview-art { width:42px;height:42px;object-fit:cover;border-radius:12px;flex:none; }
+.main-preview { flex-wrap:wrap;align-items:flex-start; }
+.main-preview-top { display:flex;align-items:center;gap:12px;width:100%;min-width:0; }
+.main-preview-copy { min-width:0;flex:1; }
+.main-preview-copy small { line-height:1.45; }
+.character-details { width:100%;border-top:1px solid var(--line);padding-top:8px;margin-top:2px; }
+.character-details summary { color:var(--accent);font-size:9px;font-weight:800;cursor:pointer; }
+.character-details-content { display:grid;gap:9px;padding-top:9px;color:var(--muted);font-size:9px;line-height:1.55; }
+.character-details-content p { margin:0; }
+.character-details-content strong { color:var(--text); }
+.character-details-section { display:grid;gap:5px; }
+.character-details-section h4 { margin:0;color:var(--text);font:700 9px "Manrope",sans-serif; }
+.character-detail-item { padding-left:9px;border-left:2px solid rgba(var(--accent-rgb),.28); }
+.character-detail-item strong { display:block; }
+.main-preview-art { width:42px;height:42px;object-fit:cover;border-radius:12px; }
+.builder-actions { display:flex;align-items:center;gap:13px;margin-top:15px; }
+.builder-actions .button { padding:13px 17px; }
+.action-caption { color:var(--muted-2);font-size:9px; }
+.team-feedback { color:var(--muted);font-size:9px;line-height:1.5;margin-top:10px;min-height:12px; }
+.team-feedback.error { color:var(--danger); }
+.team-slots { display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px; }
+.empty-slot,.team-member { min-width:0;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:121px;padding:12px 5px 9px;border:1px dashed var(--line);border-radius:11px;text-align:center; }
+.empty-slot { background:var(--surface-2);color:var(--muted); }
+.slot-number { position:absolute;top:7px;left:8px;color:var(--muted-2);font-size:8px; }
+.slot-glyph { display:grid;place-items:center;width:38px;height:38px;border-radius:12px;background:var(--surface-3);font-size:19px;color:var(--muted-2);margin-bottom:8px; }
+.empty-slot strong,.team-member strong { font-size:9px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%; }
+.empty-slot small,.team-member small { color:var(--muted);font-size:8px;margin-top:4px; }
+.team-member { border-style:solid;border-color:rgba(var(--accent-rgb),.3);background:linear-gradient(160deg,var(--accent-soft),var(--surface-2)); }
+.team-member .member-art { width:43px;height:43px;border-radius:12px;overflow:hidden;background:var(--surface-3);margin-bottom:6px; }
+.member-art img { width:100%;height:100%;object-fit:cover; }
+.team-member .slot-number { color:var(--accent); }
+.team-member .member-element { color:var(--accent);font-size:8px;margin-top:3px; }
+.team-explanation { color:var(--muted);font-size:9px;line-height:1.6;border-bottom:1px solid var(--line);padding:11px 0 13px;min-height:48px; }
+.rotation-area { padding-top:13px; }
+.rotation-heading { display:flex;justify-content:space-between;align-items:center;margin-bottom:10px; }
+.rotation-heading h3 { font:750 14px "Manrope",sans-serif;margin:5px 0 0; }
+.rotation-list { list-style:none;padding:0;margin:0;display:grid;gap:7px;counter-reset:rot; }
+.rotation-list li { position:relative;display:grid;grid-template-columns:25px 1fr;gap:9px;align-items:start;color:var(--muted);font-size:9px;line-height:1.5; }
+.rotation-list li:not(.rotation-empty)::before { counter-increment:rot;content:counter(rot,decimal-leading-zero);display:grid;place-items:center;width:24px;height:24px;border-radius:8px;background:var(--accent-soft);color:var(--accent);font-size:8px;font-weight:800; }
+.rotation-list strong { color:var(--text); }
+.rotation-empty { display:block!important;border:1px dashed var(--line);border-radius:9px;padding:11px; }
+.rotation-disclaimer { color:var(--muted-2);font-size:8px;line-height:1.5;margin:11px 0 0; }
+.page-heading { margin-bottom:30px; }
+.page-heading h1 { margin-bottom:10px; }
+.profile-layout { display:grid;grid-template-columns:minmax(300px,.9fr) minmax(370px,1.1fr);gap:20px;align-items:stretch;margin-bottom:20px; }
+.profile-connect-panel h2,.appearance-panel h2 { font:750 20px "Manrope",sans-serif;letter-spacing:-.035em;margin:7px 0 9px; }
+.muted-copy { color:var(--muted);font-size:11px;line-height:1.7;max-width:420px;margin-bottom:22px; }
+.uid-row { display:flex;gap:8px; }
+.uid-row input { flex:1;min-width:0;font-size:12px; }
+.connection-message { font-size:9px;color:var(--muted);line-height:1.6;min-height:33px;margin-top:12px; }
+.connection-message.error { color:var(--danger); }
+.privacy-note { display:flex;gap:9px;color:var(--muted-2);font-size:9px;line-height:1.55;border-top:1px solid var(--line);padding-top:14px;margin-top:16px; }
+.privacy-note span:first-child { color:var(--accent);font-size:13px; }
+.profile-preview-wrap { display:flex;flex-direction:column;justify-content:center; }
+.profile-card { position:relative;overflow:hidden;min-height:245px;border:1px solid rgba(var(--accent-rgb),.35);border-radius:18px;padding:21px 23px;background:radial-gradient(circle at 88% 10%,rgba(var(--accent-rgb),.25),transparent 40%),linear-gradient(135deg,#252b38,#11131a 72%);color:#f5f5f7;box-shadow:var(--shadow); }
+.profile-card::after { content:"✧";position:absolute;right:8%;top:28%;font-size:115px;color:rgba(255,255,255,.055);transform:rotate(14deg);pointer-events:none; }
+.profile-card[data-profile-theme="aurora"] { background:radial-gradient(circle at 85% 10%,rgba(126,205,192,.38),transparent 40%),linear-gradient(135deg,#1d3940,#101820 75%); }
+.profile-card[data-profile-theme="embers"] { background:radial-gradient(circle at 85% 5%,rgba(235,123,95,.35),transparent 42%),linear-gradient(135deg,#442c30,#171317 75%); }
+.profile-card[data-profile-theme="jade"] { background:radial-gradient(circle at 85% 5%,rgba(144,192,120,.35),transparent 42%),linear-gradient(135deg,#243a32,#101814 75%); }
+.profile-card[data-profile-theme="moonlit"] { background:radial-gradient(circle at 85% 5%,rgba(148,164,222,.4),transparent 42%),linear-gradient(135deg,#2a2d4a,#11131d 75%); }
+.profile-card-top,.profile-card-bottom { display:flex;align-items:center;justify-content:space-between;position:relative;z-index:1; }
+.profile-brand { color:rgba(255,255,255,.8);font:800 9px "Manrope",sans-serif;letter-spacing:.18em; }
+.profile-online-dot { color:rgba(255,255,255,.55);font-size:7px;letter-spacing:.13em; }
+.profile-main-row { display:flex;align-items:center;gap:16px;margin:32px 0 28px;position:relative;z-index:1; }
+.profile-picture { width:76px;height:76px;border-radius:50%;display:grid;place-items:center;overflow:hidden;background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.6);box-shadow:0 0 0 5px rgba(255,255,255,.08);font-size:28px;color:#fff;flex:none; }
+.profile-picture img { width:100%;height:100%;object-fit:cover; }
+.profile-identity { min-width:0; }
+.profile-name { font:800 23px "Manrope",sans-serif;letter-spacing:-.04em;overflow-wrap:anywhere; }
+.profile-uid { color:rgba(255,255,255,.55);font-size:8px;letter-spacing:.14em;margin-top:4px; }
+.profile-signature { color:rgba(255,255,255,.8);font-size:10px;margin-top:11px;max-width:330px;overflow-wrap:anywhere; }
+.profile-card-bottom { border-top:1px solid rgba(255,255,255,.16);padding-top:12px; }
+.profile-card-bottom div:first-child { display:flex;flex-direction:column;gap:4px; }
+.profile-card-bottom small { color:rgba(255,255,255,.45);font-size:7px;letter-spacing:.15em; }
+.profile-card-bottom strong { font-size:9px;font-weight:700; }
+.profile-card-symbol { color:rgba(255,255,255,.55);font-size:23px; }
+.profile-footnote { color:var(--muted-2);font-size:8px;line-height:1.5;margin:9px 2px 0; }
+.appearance-panel { margin-top:0; }
+.appearance-options { display:grid;grid-template-columns:190px 1fr;gap:26px; }
+.accent-picker { display:flex;flex-wrap:wrap;gap:9px;margin-bottom:7px; }
+.accent-choice { display:flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:50px;background:var(--surface-2);color:var(--muted);padding:6px 10px 6px 7px;font-size:8px; }
+.accent-choice.active { border-color:rgba(var(--accent-rgb),.65);color:var(--text);background:var(--accent-soft); }
+.accent-swatch { width:14px;height:14px;border-radius:50%;background:var(--swatch);box-shadow:0 0 0 2px rgba(255,255,255,.08); }
+.reward-strip { display:flex;align-items:center;gap:17px;padding:19px 22px;margin-bottom:30px; }
+.reward-emblem { display:grid;place-items:center;width:49px;height:49px;border-radius:15px;background:var(--accent-soft);color:var(--accent);font-size:27px; }
+.reward-copy { display:flex;flex-direction:column;gap:4px;flex:1; }
+.reward-copy strong { font:800 21px "Manrope",sans-serif; }
+.reward-copy strong span { color:var(--gold); }
+.reward-copy small { color:var(--muted);font-size:9px; }
+.reward-claimed { color:var(--accent);font-size:9px;font-weight:800; }
+.shop-heading { display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:15px; }
+.shop-count { color:var(--muted-2);font-size:9px; }
+.theme-shop-grid { display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px; }
+.theme-card { overflow:hidden;border:1px solid var(--line);border-radius:14px;background:var(--surface); }
+.theme-preview { height:115px;position:relative;overflow:hidden;background:var(--theme-bg); }
+.theme-preview::before { content:"";position:absolute;width:145px;height:145px;border-radius:50%;right:-15px;top:-55px;background:var(--theme-glow);filter:blur(12px); }
+.theme-preview::after { content:"✦";position:absolute;right:24px;bottom:12px;font-size:48px;color:rgba(255,255,255,.23); }
+.theme-preview .preview-orbit { position:absolute;left:18px;top:18px;width:66px;height:66px;border:1px solid rgba(255,255,255,.26);border-radius:50%;display:grid;place-items:center;color:rgba(255,255,255,.75);font-size:24px; }
+.theme-info { padding:13px; }
+.theme-info h3 { font:750 13px "Manrope",sans-serif;margin:0 0 5px; }
+.theme-info p { color:var(--muted);font-size:8px;line-height:1.5;min-height:25px;margin:0 0 12px; }
+.theme-buy-row { display:flex;align-items:center;justify-content:space-between;gap:8px; }
+.theme-price { color:var(--gold);font-size:9px;font-weight:800;white-space:nowrap; }
+.theme-buy-row .button { padding:8px 10px;font-size:8px; }
+.theme-buy-row .button.equipped { background:var(--accent-soft);border-color:rgba(var(--accent-rgb),.3);color:var(--accent); }
+.theme-buy-row .button.owned-theme { background:var(--surface-3);border-color:var(--line);color:var(--muted); }
+.shop-note { color:var(--muted-2);font-size:9px;line-height:1.6;border-top:1px solid var(--line);padding-top:13px;margin-top:18px; }
+.site-footer { display:flex;align-items:center;justify-content:space-between;gap:16px;border-top:1px solid var(--line);padding:20px 0 24px;color:var(--muted-2);font-size:8px; }
+.footer-brand { color:var(--muted);font:800 9px "Manrope",sans-serif;letter-spacing:.16em; }
+.footer-brand span { color:var(--accent);font-size:15px;margin-right:5px;vertical-align:-1px; }
+.toast { position:fixed;bottom:24px;left:50%;transform:translate(-50%,20px);background:var(--surface-3);border:1px solid rgba(var(--accent-rgb),.35);color:var(--text);box-shadow:var(--shadow);padding:11px 16px;border-radius:10px;font-size:10px;opacity:0;pointer-events:none;transition:.25s;z-index:99;max-width:min(90vw,460px);text-align:center; }
+.toast.show { opacity:1;transform:translate(-50%,0); }
+
+/* Banner radar, events and wish planner */
+.count-pill { display:inline-flex;align-items:center;gap:4px; }
+.count-pill strong + strong { margin-left:2px; }
+.banner-page-grid { display:grid;grid-template-columns:minmax(0,1.35fr) minmax(300px,.65fr);gap:20px;align-items:start; }
+.banner-main-column { display:grid;gap:20px;min-width:0; }
+.banner-radar-panel,.events-panel,.wish-planner-panel { padding:22px; }
+.banner-panel-heading { align-items:center; }
+.server-picker { display:flex;align-items:center;gap:8px;color:var(--muted-2);font-size:8px;font-weight:800;letter-spacing:.12em; }
+.server-picker .filter-select { min-width:132px; }
+.banner-cards { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px; }
+.banner-phase-card { min-width:0;border:1px solid var(--line);border-radius:14px;padding:15px;background:linear-gradient(150deg,var(--accent-soft),var(--surface-2) 62%); }
+.banner-phase-card.next { background:linear-gradient(150deg,rgba(220,191,132,.12),var(--surface-2) 68%); }
+.banner-card-top { display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px; }
+.banner-phase-tag { color:var(--muted);font-size:8px;font-weight:800;letter-spacing:.1em;text-transform:uppercase; }
+.banner-live-tag { border-radius:50px;padding:5px 8px;background:var(--accent-soft);color:var(--accent);font-size:8px;font-weight:800;white-space:nowrap; }
+.banner-phase-card.next .banner-live-tag { background:rgba(220,191,132,.13);color:var(--gold); }
+.banner-phase-card h3 { margin:0 0 5px;font:800 17px "Manrope",sans-serif;letter-spacing:-.035em; }
+.banner-version { margin:0 0 13px;color:var(--muted);font-size:8px; }
+.banner-featured-list { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-bottom:13px; }
+.banner-featured { display:flex;align-items:center;gap:8px;min-width:0;border:1px solid var(--line);border-radius:10px;padding:7px;background:var(--surface); }
+.banner-featured-art { width:38px;height:38px;flex:none;overflow:hidden;border-radius:10px;background:var(--surface-3);display:grid;place-items:center;color:var(--accent);font:800 14px "Manrope",sans-serif; }
+.banner-featured-art img { width:100%;height:100%;object-fit:cover; }
+.banner-featured-copy { min-width:0;display:flex;flex-direction:column;gap:3px; }
+.banner-featured-copy strong { font-size:9px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+.banner-featured-copy small { color:var(--muted);font-size:8px; }
+.banner-countdown { display:flex;justify-content:space-between;align-items:center;gap:9px;border-top:1px solid var(--line);padding-top:11px; }
+.banner-countdown span { color:var(--muted);font-size:8px;line-height:1.4; }
+.banner-countdown strong { color:var(--text);font:800 11px "Manrope",sans-serif;text-align:right; }
+.banner-fourstars { margin:11px 0 0;color:var(--muted);font-size:8px;line-height:1.6; }
+.banner-fourstars strong { color:var(--text); }
+.banner-subgrid { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:13px; }
+.banner-mini-card { min-width:0;padding:13px;border:1px solid var(--line);border-radius:12px;background:var(--surface-2); }
+.banner-mini-card h3 { font:750 12px "Manrope",sans-serif;margin:7px 0 6px; }
+.banner-mini-card p { margin:0;color:var(--muted);font-size:8px;line-height:1.6; }
+.banner-source-note { margin:13px 1px 0;color:var(--muted-2);font-size:8px;line-height:1.6; }
+.banner-source-note a { color:var(--accent);text-decoration:none; }
+.banner-source-note a:hover { text-decoration:underline; }
+.event-list { display:grid;gap:8px; }
+.event-row { display:flex;align-items:center;gap:11px;padding:11px;border:1px solid var(--line);border-radius:11px;background:var(--surface-2); }
+.event-icon { width:34px;height:34px;display:grid;place-items:center;flex:none;border-radius:10px;background:var(--accent-soft);color:var(--accent);font-size:16px; }
+.event-copy { min-width:0;flex:1;display:flex;flex-direction:column;gap:4px; }
+.event-copy strong { font-size:9px; }
+.event-copy small { color:var(--muted);font-size:8px; }
+.event-until { color:var(--gold);font-size:8px;font-weight:800;text-align:right;white-space:nowrap; }
+.wish-planner-panel h2 { font:750 20px "Manrope",sans-serif;letter-spacing:-.035em;margin:7px 0 8px; }
+.planner-intro { color:var(--muted);font-size:9px;line-height:1.65;margin-bottom:18px; }
+.planner-input-grid { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:14px 0; }
+.planner-input { width:100%;height:40px;background:var(--surface-2);border:1px solid var(--line);border-radius:9px;color:var(--text);padding:0 10px;font:700 12px "Manrope",sans-serif; }
+.planner-range { width:100%;accent-color:var(--accent);margin:2px 0 14px; }
+.guarantee-toggle { display:flex;align-items:flex-start;gap:9px;padding:12px;border:1px solid var(--line);border-radius:11px;background:var(--surface-2);cursor:pointer; }
+.guarantee-toggle input { margin:2px 0 0;accent-color:var(--accent); }
+.guarantee-toggle span { display:flex;flex-direction:column;gap:4px; }
+.guarantee-toggle strong { font-size:9px; }
+.guarantee-toggle small { color:var(--muted);font-size:8px;line-height:1.5; }
+.planner-results { padding:13px;margin-top:14px;border:1px solid rgba(var(--accent-rgb),.25);border-radius:12px;background:linear-gradient(145deg,var(--accent-soft),transparent 80%); }
+.planner-stat { display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:9px; }
+.planner-stat span { color:var(--muted);font-size:8px; }
+.planner-stat strong { font:800 17px "Manrope",sans-serif; }
+.planner-progress-track { height:7px;border-radius:20px;overflow:hidden;background:var(--surface-3);margin:11px 0; }
+.planner-progress-track span { display:block;height:100%;width:0;border-radius:inherit;background:var(--accent);transition:width .25s; }
+.planner-message { margin:0;color:var(--text);font-size:9px;line-height:1.55; }
+.planner-disclaimer { margin:13px 0 0;color:var(--muted-2);font-size:8px;line-height:1.6; }
+@media (max-width:900px) { .banner-page-grid { grid-template-columns:1fr; }.wish-planner-panel { max-width:none; } }
+@media (max-width:650px) { .banner-radar-panel,.events-panel,.wish-planner-panel { padding:16px; }.banner-cards,.banner-subgrid { grid-template-columns:1fr; }.banner-panel-heading { align-items:flex-start;flex-direction:column; }.server-picker { width:100%;justify-content:space-between; }.server-picker .filter-select { flex:1;max-width:180px; }.banner-featured { padding:8px; }.banner-phase-card h3 { font-size:16px; }.banner-countdown strong { font-size:10px; }.event-until { white-space:normal;max-width:90px; } }
+
+@media (max-width:1180px) { .app-shell{padding:0 28px}.workspace-grid{grid-template-columns:minmax(0,1fr) minmax(350px,.9fr)}.character-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.hero-note{min-width:245px} }
+@media (max-width:900px) { .workspace-grid,.profile-layout{grid-template-columns:1fr}.right-column{grid-template-columns:1fr 1fr;align-items:start}.result-panel{grid-column:span 2}.profile-preview-wrap{min-height:230px}.theme-shop-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.hero-row{align-items:flex-start;flex-direction:column}.hero-note{margin:0} }
+@media (max-width:650px) { .catalog-sync{align-items:flex-start;flex-wrap:wrap}.catalog-sync-copy{flex-basis:calc(100% - 48px)}.catalog-sync-actions{width:100%}.catalog-sync-actions .button{width:auto;flex:1}.app-shell{padding:0 15px}.topbar{min-height:72px;flex-wrap:wrap;gap:6px;padding:12px 0}.brand{min-width:0}.brand-copy small{display:none}.main-nav{order:3;width:100%;justify-content:center;gap:0}.nav-link{flex:1;padding:10px 4px;font-size:11px}.topbar-right{min-width:0}.wallet small{display:none}.view{padding:30px 0 45px}.right-column{display:grid;grid-template-columns:1fr}.result-panel{grid-column:auto}.character-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.roster-panel,.builder-panel,.result-panel,.profile-connect-panel,.appearance-panel{padding:16px}.roster-tools{flex-wrap:wrap}.search-box{flex-basis:100%}.filter-select{max-width:none;flex:1}.import-box{display:flex;flex-direction:column;align-items:stretch;gap:12px}.import-symbol{align-self:flex-start}.import-controls{width:100%;min-width:0;grid-column:auto;display:flex;align-items:center;flex-wrap:wrap;gap:10px}.import-box .upload-button{position:static;align-self:center;display:inline-flex;width:auto;max-width:100%;min-width:132px;min-height:42px;margin:0;flex:0 0 auto;z-index:auto}.import-controls .file-list{min-width:0;flex:1 1 130px}.import-controls #scanButton{flex:0 0 auto}.team-slots{gap:5px}.empty-slot,.team-member{min-height:112px}.profile-layout{grid-template-columns:minmax(0,1fr)}.profile-card{padding:17px;min-height:225px}.profile-main-row{margin:27px 0 23px}.profile-name{font-size:19px}.appearance-options{grid-template-columns:1fr;gap:17px}.reward-strip{flex-wrap:wrap;padding:15px}.reward-copy{min-width:calc(100% - 70px)}.reward-strip .button{width:100%}.theme-shop-grid{gap:9px}.theme-preview{height:90px}.site-footer{flex-wrap:wrap;justify-content:center;text-align:center}.site-footer span:last-child{display:none} }
+@media (max-width:390px) { .character-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.count-pill{font-size:8px}.panel-heading h2{font-size:17px}.theme-shop-grid{grid-template-columns:1fr 1fr}.team-slots{grid-template-columns:repeat(2,minmax(0,1fr))} }
+
+  </style>
+</head>
+<body>
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="#top" aria-label="Starglow home">
+        <span class="brand-mark"><span>✦</span></span>
+        <span class="brand-copy"><strong>STARGLOW</strong><small>TEYVAT TEAM STUDIO</small></span>
+      </a>
+      <nav class="main-nav" aria-label="Main navigation">
+        <button class="nav-link active" data-view="teamView">Team lab</button>
+        <button class="nav-link" data-view="profileView">Profile</button>
+        <button class="nav-link" data-view="teyvatView">Banners</button>
+        <button class="nav-link" data-view="atelierView">Atelier</button>
+        <button class="nav-link" data-view="blogView">Blog</button>
+        <button class="nav-link" data-view="aboutView">About</button>
+      </nav>
+      <div class="topbar-right">
+        <div class="wallet" title="Your Stargems"><span class="gem-icon">✧</span><strong id="walletBalance">120</strong><small>STARGEMS</small></div>
+        <button class="avatar-mini" id="openProfileButton" aria-label="Open profile">S</button>
+      </div>
+    </header>
+
+    <main id="top">
+      <section class="view active" id="teamView">
+        <div class="hero-row">
+          <div>
+            <div class="eyebrow"><span class="eyebrow-line"></span> YOUR NEXT ADVENTURE STARTS HERE</div>
+            <h1>Build a team that<br /><em>shines together.</em></h1>
+            <p class="hero-subtitle">Choose your on-field star. Starglow will find the best teammates from the characters you own and map out a rotation to try.</p>
+          </div>
+          <div class="hero-note"><span class="note-star">✦</span><div><strong>Your roster. Your strategy.</strong><small>Single-player team planning · No co-op matching</small></div></div>
+        </div>
+
+        <div class="workspace-grid">
+          <section class="panel roster-panel">
+            <div class="panel-heading">
+              <div><div class="section-kicker">01 / COLLECTION</div><h2>Your character roster</h2></div>
+              <span class="count-pill"><strong id="ownedCount">0</strong> owned · <strong id="totalCharacterCount">—</strong> in catalog</span>
+            </div>
+            <div class="catalog-sync" aria-live="polite">
+              <span class="catalog-sync-mark">↻</span>
+              <div class="catalog-sync-copy"><strong>Live character catalog</strong><small id="catalogStatus">Checking for the latest characters when online…</small></div>
+              <div class="catalog-sync-actions">
+                <button class="button button-outline" id="auditPortraitsButton" type="button">Audit portraits</button>
+                <button class="button button-outline" id="syncCatalogButton" type="button">Check updates</button>
+              </div>
+            </div>
+            <p class="catalog-source">Character data is refreshed from community feeds including <a href="https://genshin.jmp.blue" target="_blank" rel="noopener noreferrer">genshin.dev</a>, <a href="https://github.com/theBowja/genshin-db" target="_blank" rel="noopener noreferrer">GenshinDB</a> and Project Amber. Portraits try Enka, Yatta and Ambr asset paths. Automatic refresh is every 12 hours; failed feeds retry every 10 minutes.</p>
+            <div class="import-box">
+              <div class="import-symbol">⇧</div>
+              <div class="import-copy"><strong>Import your in-game screenshots</strong><small>Upload character-list screenshots. Starglow compares the portrait pictures directly — it does not read character names.</small></div>
+              <div class="import-scan-warning" role="note"><span class="warning-icon" aria-hidden="true">⚠</span><span><strong>Scanning may be inaccurate.</strong> Portrait matching is only a suggestion and can miss characters or identify them incorrectly. Please review every result and manually select your characters in the roster to make sure your collection is correct.</span></div>
+              <input id="screenshotInput" type="file" accept="image/*" multiple hidden />
+              <div class="import-controls">
+                <label class="button button-outline upload-button" for="screenshotInput">Choose images</label>
+                <div class="file-list" id="fileList">No screenshots selected</div>
+                <button class="button button-soft" id="scanButton" disabled>Recognize portraits</button>
+              </div>
+              <div class="portrait-scan-panel" id="portraitScanPanel" hidden>
+                <div class="portrait-scan-heading"><div><strong>Manual portrait review</strong><small>Every portrait tile is reviewed manually. Choose the screenshot layout and grid size, then select the correct character from the visual shortlist. Nothing is added automatically.</small></div><button class="button button-soft" id="resetPortraitCrop" type="button">Reset crop</button></div>
+                <div class="portrait-preview-wrap"><canvas id="portraitPreviewCanvas" aria-label="Screenshot preview. Drag to select the character portrait grid."></canvas></div>
+                <div class="portrait-grid-controls">
+                  <label>Screenshot layout<select class="filter-select" id="portraitLayout"><option value="single" selected>One grid</option><option value="split">Two grids side by side</option></select></label>
+                  <label>Columns per grid<select class="filter-select" id="portraitColumns"><option selected>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option></select></label>
+                  <label>Rows per grid<select class="filter-select" id="portraitRows"><option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option></select></label>
+                  <small class="portrait-grid-note" id="portraitLayoutStatus">Choose one grid or two side-by-side grids manually. Drag the crop overlay to fit the portrait area.</small>
+                </div>
+              </div>
+              <div class="scan-progress" id="scanProgress" hidden><span class="progress-track"><i id="scanProgressBar"></i></span><span id="scanStatus">Preparing visual scan…</span></div>
+              <div class="portrait-scan-results" id="portraitScanResults" hidden></div>
+              <p class="micro-hint">Manual-only image review: Starglow compares portrait photos and suggests up to 10 visually similar characters for each tile. Nothing is auto-detected or added to your roster. No OCR or character-name reading is used.</p>
+            </div>
+
+            <div class="roster-tools">
+              <label class="search-box"><span>⌕</span><input id="characterSearch" type="search" placeholder="Search characters…" autocomplete="off" /></label>
+              <select id="elementFilter" class="filter-select" aria-label="Filter by element">
+                <option value="all">All elements</option><option value="Pyro">Pyro</option><option value="Hydro">Hydro</option><option value="Electro">Electro</option><option value="Cryo">Cryo</option><option value="Dendro">Dendro</option><option value="Anemo">Anemo</option><option value="Geo">Geo</option>
+              </select>
+              <label class="owned-toggle"><input id="showOwnedOnly" type="checkbox" /> <span>Owned only</span></label>
+            </div>
+            <div class="character-grid" id="characterGrid" aria-live="polite"></div>
+            <div class="roster-footer"><span>All catalog characters are shown by default. Tap a character to mark or unmark ownership.</span><span id="rosterCatalogFootnote">Online catalog syncs automatically.</span></div>
+          </section>
+
+          <section class="right-column">
+            <section class="panel builder-panel">
+              <div class="panel-heading compact-heading">
+                <div><div class="section-kicker">02 / TEAM BUILDER</div><h2>Choose your main</h2></div>
+                <span class="sparkle-badge">✧ SMART PICK</span>
+              </div>
+              <label class="field-label" for="mainCharacter">On-field character</label>
+              <select class="main-select" id="mainCharacter"><option value="">Choose from your roster…</option></select>
+              <div class="main-preview" id="mainPreview"><div class="main-preview-orbit">✦</div><div><strong>Your main character goes here</strong><small>Pick an owned character to begin.</small></div></div>
+              <div class="builder-actions"><button class="button button-primary" id="buildTeamButton">✦ Build my team</button><span class="action-caption">Uses your owned roster only</span></div>
+              <div class="team-feedback" id="teamFeedback" role="status"></div>
+            </section>
+
+            <section class="panel result-panel" id="resultPanel">
+              <div class="panel-heading compact-heading">
+                <div><div class="section-kicker">03 / YOUR LINEUP</div><h2>Recommended team</h2></div>
+                <span class="result-status" id="resultStatus">AWAITING MAIN</span>
+              </div>
+              <div class="team-slots" id="teamSlots">
+                <div class="empty-slot main-slot"><span class="slot-number">01</span><span class="slot-glyph">✧</span><strong>Your main</strong><small>Waiting for selection</small></div>
+                <div class="empty-slot"><span class="slot-number">02</span><span class="slot-glyph">＋</span><strong>Teammate</strong><small>Will be suggested</small></div>
+                <div class="empty-slot"><span class="slot-number">03</span><span class="slot-glyph">＋</span><strong>Teammate</strong><small>Will be suggested</small></div>
+                <div class="empty-slot"><span class="slot-number">04</span><span class="slot-glyph">＋</span><strong>Teammate</strong><small>Will be suggested</small></div>
+              </div>
+              <div class="team-explanation" id="teamExplanation">Your team and synergy notes will appear here after you build a lineup.</div>
+              <div class="rotation-area">
+                <div class="rotation-heading"><div><div class="section-kicker">04 / COMBAT FLOW</div><h3>Suggested rotation</h3></div><span class="loop-label">↻ REPEAT</span></div>
+                <ol class="rotation-list" id="rotationList"><li class="rotation-empty">Build a team to see a starter rotation sequence.</li></ol>
+                <p class="rotation-disclaimer">Rotation notes are general starter guidance. Cooldowns, energy, enemy behavior and character builds can change the optimal order.</p>
+              </div>
+            </section>
+          </section>
+        </div>
+      </section>
+
+      <section class="view" id="profileView">
+        <div class="page-heading"><div class="eyebrow"><span class="eyebrow-line"></span> YOUR LITTLE CORNER OF TEYVAT</div><h1>Adventurer <em>profile.</em></h1><p>Connect a public Genshin UID through Enka.Network and style your Starglow profile.</p></div>
+        <div class="profile-layout">
+          <section class="panel profile-connect-panel">
+            <div class="section-kicker">ACCOUNT CONNECTION</div><h2>Find your game profile</h2>
+            <p class="muted-copy">Enter your Genshin UID. Your in-game nickname, signature and profile-picture character are read from the public player profile provided by Enka.Network.</p>
+            <form id="enkaForm" class="uid-form"><label for="uidInput" class="field-label">Genshin UID</label><div class="uid-row"><input id="uidInput" type="text" inputmode="numeric" maxlength="10" placeholder="Enter your 9-digit UID" /><button class="button button-primary" type="submit" id="fetchProfileButton">Connect</button></div></form>
+            <div class="connection-message" id="connectionMessage" role="status">Your UID is only used for this lookup. The prototype stores the display result locally on this browser.</div>
+            <div class="privacy-note"><span>ⓘ</span><span>Starglow is a single-player companion, not a co-op or cross-player service. Do not enter your HoYoverse password.</span></div>
+          </section>
+          <section class="profile-preview-wrap">
+            <div class="profile-card" id="profileCard" data-profile-theme="starlit">
+              <div class="profile-card-top"><span class="profile-brand">✦ STARGLOW</span><span class="profile-online-dot">● PUBLIC PROFILE</span></div>
+              <div class="profile-main-row"><div class="profile-picture" id="profilePicture"><span>✧</span></div><div class="profile-identity"><div class="profile-name" id="profileName">Wandering Traveler</div><div class="profile-uid" id="profileUid">UID NOT CONNECTED</div><div class="profile-signature" id="profileSignature">“May the stars guide your way.”</div></div></div>
+              <div class="profile-card-bottom"><div><small>PROFILE THEME</small><strong id="profileThemeName">Starlit default</strong></div><div class="profile-card-symbol">✦</div></div>
+            </div>
+            <div class="profile-footnote" id="profileFootnote">Connect a UID to replace this preview with your public game details.</div>
+          </section>
+        </div>
+        <section class="panel appearance-panel"><div class="panel-heading compact-heading"><div><div class="section-kicker">PROFILE APPEARANCE</div><h2>Make it yours</h2></div><button class="button button-soft" id="openAtelierFromProfile">Browse themes ↗</button></div>
+          <div class="appearance-options"><div><label class="field-label" for="modeSelect">Background</label><select id="modeSelect" class="filter-select"><option value="dark">Midnight black</option><option value="light">Porcelain white</option></select></div><div class="accent-picker-wrap"><span class="field-label">Nation-inspired accent</span><div class="accent-picker" id="accentPicker"></div><small class="micro-hint">Eight palette choices, inspired by the regions and mysteries of Teyvat.</small></div></div>
+        </section>
+      </section>
+
+      <section class="view" id="atelierView">
+        <div class="page-heading"><div class="eyebrow"><span class="eyebrow-line"></span> A LITTLE REWARD FOR YOUR JOURNEY</div><h1>The Starglow <em>atelier.</em></h1><p>Collect Stargems and spend them on profile themes that make your corner of Teyvat feel like home.</p></div>
+        <div class="reward-strip panel"><div class="reward-emblem">✧</div><div class="reward-copy"><div class="section-kicker">YOUR STARGEM BALANCE</div><strong><span id="atelierBalance">120</span> Stargems</strong><small>Earn more by checking in and building teams.</small></div><button class="button button-primary" id="dailyRewardButton">Claim daily gift · +20</button><span class="reward-claimed" id="dailyClaimedLabel" hidden>✦ Daily gift claimed</span></div>
+        <div class="shop-heading"><div><div class="section-kicker">THEME COLLECTION</div><h2>Choose your atmosphere</h2></div><span class="shop-count">Profile cosmetics only</span></div>
+        <div class="theme-shop-grid" id="themeShopGrid"></div>
+        <div class="shop-note">Themes change your Starglow profile card only. Purchases and currency are saved in this browser in this prototype; a real public launch needs server-side accounts and transaction validation.</div>
+      </section>
+
+      <section class="view" id="teyvatView">
+        <div class="page-heading"><div class="eyebrow"><span class="eyebrow-line"></span> THE LATEST FROM TEYVAT</div><h1>Wish with a <em>plan.</em></h1><p>Check the current and next Event Wishes, follow the Asia-server countdown, and work out how many pulls you can save before your target arrives.</p></div>
+        <div class="banner-page-grid">
+          <div class="banner-main-column">
+            <section class="panel banner-radar-panel">
+              <div class="panel-heading banner-panel-heading"><div><div class="section-kicker">01 / BANNER RADAR</div><h2>Current & next 5★ characters</h2></div><label class="server-picker"><span>SERVER</span><select id="bannerServer" class="filter-select" aria-label="Choose Genshin server"><option value="asia">Asia · UTC+8</option><option value="america">America · UTC−5</option><option value="europe">Europe · UTC+1</option></select></label></div>
+              <div id="bannerCards" class="banner-cards" aria-live="polite"></div>
+              <p class="banner-source-note">Starglow displays featured 5★ characters only. Check the in-game notice to confirm banner details before spending Primogems.</p>
+              <p class="banner-source-note">Schedule snapshot checked November 22, 2026. Server times can differ. Confirm the final details in-game before spending Primogems. <a href="https://www.hoyolab.com/article/47494924" target="_blank" rel="noopener noreferrer">HoYoLAB Phase II notice</a> · <a href="https://timesaver.gg/blog/genshin-banner-schedule-october-2026" target="_blank" rel="noopener noreferrer">Schedule details</a></p>
+            </section>
+
+            <section class="panel events-panel">
+              <div class="panel-heading compact-heading"><div><div class="section-kicker">02 / LIMITED-TIME CONTENT</div><h2>Events to keep an eye on</h2></div><span class="sparkle-badge">TEYVAT LIVE</span></div>
+              <div class="event-list" id="eventList"></div>
+              <p class="banner-source-note">Event times are a community-tracker snapshot, not an in-game notification. <a href="https://www.genshincodex.com/en/events" target="_blank" rel="noopener noreferrer">View live event tracker</a>.</p>
+            </section>
+          </div>
+
+          <section class="panel wish-planner-panel">
+            <div class="section-kicker">03 / PERSONAL PULL TRACKER</div><h2>Wish planner</h2>
+            <p class="planner-intro">Enter your current Primogems, Intertwined Fates and Character Event Wish pity. Your numbers stay saved in this browser.</p>
+            <label class="field-label" for="wishTarget">Saving for</label>
+            <select id="wishTarget" class="main-select"><option value="Zibai">Zibai</option><option value="Linnea">Linnea</option><option value="next-featured">Next featured 5★</option></select>
+            <div class="planner-input-grid">
+              <label><span class="field-label">Primogems</span><input id="wishPrimogems" class="planner-input" type="number" min="0" max="999999" step="1" value="0" inputmode="numeric"></label>
+              <label><span class="field-label">Intertwined Fates</span><input id="wishFates" class="planner-input" type="number" min="0" max="9999" step="1" value="0" inputmode="numeric"></label>
+            </div>
+            <label class="field-label" for="wishPity">Current character banner pity <strong id="wishPityValue">0</strong> / 90</label>
+            <input id="wishPity" class="planner-range" type="range" min="0" max="89" value="0">
+            <label class="guarantee-toggle"><input id="wishGuaranteed" type="checkbox"><span><strong>My next 5★ is guaranteed featured</strong><small>Tick this if you most recently lost the 50/50 on a Character Event Wish.</small></span></label>
+            <div class="planner-results">
+              <div class="planner-stat"><span>Pulls available</span><strong id="wishAvailable">0</strong></div>
+              <div class="planner-stat"><span>Worst-case pulls to target</span><strong id="wishNeeded">180</strong></div>
+              <div class="planner-progress-track"><span id="wishProgress"></span></div>
+              <p class="planner-message" id="wishMessage" aria-live="polite">Add your savings and pity to see how close you are to a hard-pity guarantee.</p>
+            </div>
+            <p class="planner-disclaimer">This is a conservative Character Event Wish calculator using the 90-pull hard pity and 180-pull worst-case guarantee. It does not track Weapon Event Wish or Chronicled Wish pity, and it does not predict 5★ odds.</p>
+          </section>
+        </div>
+      </section>
+
+      <section class="view editorial-view" id="blogView">
+        <div class="page-heading"><div class="eyebrow"><span class="eyebrow-line"></span> NOTES FROM THE TEAM-BUILDING JOURNEY</div><h1>The Starglow <em>journal.</em></h1><p>Practical ideas and approachable guides to help you understand your characters, build cohesive teams, and make the most of your adventures across Teyvat.</p></div>
+        <div class="editorial-grid">
+          <article class="panel editorial-card editorial-feature"><div class="section-kicker">TEAM BUILDING · THE FUNDAMENTALS</div><h2>Build around a plan, not just powerful characters</h2><p>A strong team is more than four individually impressive characters. Start by deciding what your on-field character needs, then choose teammates who provide the right reactions, buffs, healing, protection, or energy.</p><p>Think of each slot as having a purpose. When the pieces support one another, a team often feels smoother and more reliable than a lineup assembled around rarity alone.</p><div class="editorial-takeaway"><strong>Try this:</strong> Pick your main damage dealer, identify how they deal damage, and fill the remaining slots with support that helps them do it consistently.</div></article>
+          <article class="panel editorial-card"><div class="section-kicker">ROLES & SYNERGY</div><h2>Give every team slot a job</h2><p>Before choosing a teammate, ask what your team is missing. You may need off-field damage, elemental application, a healer, a shielder, a buffer, or a battery to help with Burst uptime.</p><p>Not every team needs every role. The best combination depends on the characters you own and the way you want to play.</p></article>
+          <article class="panel editorial-card"><div class="section-kicker">COMBAT FLOW</div><h2>Make your rotation feel natural</h2><p>A rotation is a repeatable order for setting up your team and using its abilities. In general, apply support effects first, prepare reactions and buffs, then bring in your main damage dealer while those effects are active.</p><p>Treat any suggested rotation as a starting point. Adjust it for cooldowns, Energy needs, enemy movement, and the duration of your buffs.</p></article>
+          <article class="panel editorial-card"><div class="section-kicker">A NOTE FOR EVERY ACCOUNT</div><h2>Build with the roster you have</h2><p>You do not need every limited character to make a capable team. Familiar four-star characters, free options, and flexible supports can form a dependable foundation.</p><p>Experiment with what you have, learn why a combination works, and improve it gradually as your roster grows.</p></article>
+        </div>
+        <p class="editorial-footnote">Starglow journal articles are general, fan-made guidance. Character kits, game balance, and available content may change over time.</p>
+      </section>
+
+      <section class="view editorial-view" id="aboutView">
+        <div class="page-heading"><div class="eyebrow"><span class="eyebrow-line"></span> THE PERSON BEHIND STARGLOW</div><h1>About the <em>creator.</em></h1><p>A little about the idea, purpose, and person behind this fan-made team-building project.</p></div>
+        <section class="panel about-card">
+          <div class="about-mark">✦</div>
+          <div class="section-kicker">CREATED BY ARTHUR · PHILIPPINES</div>
+          <h2>Hello, I’m Arthur.</h2>
+          <p>I’m a creator based in the Philippines, and I built Starglow to make team-building in Genshin Impact more approachable and enjoyable.</p>
+          <p>My goal is to help players make informed choices with the characters they already have, understand how those characters work together, and create effective teams they can continue using throughout their journey in the game.</p>
+          <p>Starglow brings roster planning, teammate recommendations, and rotation guidance into one place. It is designed to support experimentation and help players find team combinations that suit their own playstyle and progress.</p>
+          <p class="about-signoff">Thank you for visiting Starglow. I hope it makes your adventures across Teyvat a little easier to plan — and a lot more fun.</p>
+          <div class="about-signature">— Arthur <span>Creator of Starglow</span></div>
+          <div class="about-contact">
+            <strong>Questions or inquiries?</strong>
+            <p>For feedback, suggestions, or other inquiries about Starglow, feel free to reach out by email.</p>
+            <a href="mailto:arthurjames_genshin@outlook.ph">arthurjames_genshin@outlook.ph</a>
+          </div>
+        </section>
+        <p class="editorial-footnote">Starglow is an independent fan-made project and is not affiliated with or endorsed by HoYoverse.</p>
+      </section>
+    </main>
+    <footer class="site-footer"><div class="footer-brand"><span>✦</span> STARGLOW</div><span>Fan-made team planning concept · Not affiliated with HoYoverse</span><span>Made for your own adventure.</span></footer>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+/* Embedded character database */
+/* STARGLOW / PART 3 OF 5
+ * Curated recommendations plus a live, multi-source game-data catalog.
+ * The local entries are a quick-start cache; the online catalog expands this to the current playable roster.
+ */
+window.StarglowData = (() => {
+  const characters = [
+    { id:'neuvillette', name:'Neuvillette', element:'Hydro', role:'Main DPS', weapon:'Catalyst', icon:'UI_AvatarIcon_Neuvillette_Circle', enkaId:10000087, tags:['charged','hydro','hypercarry'], rotation:'Use support abilities first, then Skill → Charged Attack; Burst when available.' },
+    { id:'arlecchino', name:'Arlecchino', element:'Pyro', role:'Main DPS', weapon:'Polearm', icon:'UI_AvatarIcon_Arlecchino_Circle', enkaId:10000096, tags:['vaporize','pyro','normal'], rotation:'Set up off-field Hydro or buffs, then Skill → apply marks → Charged Attack → Normal Attack string.' },
+    { id:'raiden', name:'Raiden Shogun', element:'Electro', role:'Main DPS', weapon:'Polearm', icon:'UI_AvatarIcon_Shougun_Circle', enkaId:10000052, tags:['electro','burst','electrocharged'], rotation:'Use teammates’ Bursts and support skills, then Skill → Burst → enhanced attacks.' },
+    { id:'hutao', name:'Hu Tao', element:'Pyro', role:'Main DPS', weapon:'Polearm', icon:'UI_AvatarIcon_Hutao_Circle', enkaId:10000046, tags:['vaporize','pyro','charged'], rotation:'Apply Hydro and buffs, then Skill → charged-attack combo; Burst to heal or finish.' },
+    { id:'xiao', name:'Xiao', element:'Anemo', role:'Main DPS', weapon:'Polearm', icon:'UI_AvatarIcon_Xiao_Circle', enkaId:10000026, tags:['plunge','anemo','hypercarry'], rotation:'Apply buffs and healing, then Skill charges → Burst → plunge attacks.' },
+    { id:'navia', name:'Navia', element:'Geo', role:'Main DPS', weapon:'Claymore', icon:'UI_AvatarIcon_Navia_Circle', enkaId:10000091, tags:['geo','crystallize','quick-swap'], rotation:'Apply an element for Crystallize, use support skills, then Burst → Skill with shard stacks.' },
+    { id:'alhaitham', name:'Alhaitham', element:'Dendro', role:'Main DPS', weapon:'Sword', icon:'UI_AvatarIcon_Alhatham_Circle', enkaId:10000078, tags:['spread','quicken','dendro'], rotation:'Apply Electro and buffs, then Burst or Skill → mirror-infused attacks; refresh mirrors with Charged Attack.' },
+    { id:'ayaka', name:'Kamisato Ayaka', aliases:['Ayaka'], element:'Cryo', role:'Main DPS', weapon:'Sword', icon:'UI_AvatarIcon_Ayaka_Circle', enkaId:10000002, tags:['freeze','cryo','burst'], rotation:'Apply Hydro and buffs, sprint to infuse Cryo, then Skill → Burst → charged attacks.' },
+    { id:'wanderer', name:'Wanderer', element:'Anemo', role:'Main DPS', weapon:'Catalyst', icon:'UI_AvatarIcon_Wanderer_Circle', enkaId:10000075, tags:['anemo','hypercarry','normal'], rotation:'Apply buffs and off-field elements, then Skill → aerial Normal/Charged Attacks → Burst.' },
+    { id:'lyney', name:'Lyney', element:'Pyro', role:'Main DPS', weapon:'Bow', icon:'UI_AvatarIcon_Liney_Circle', enkaId:10000085, tags:['mono-pyro','pyro','charged'], rotation:'Set up Pyro supports, then Skill → charged shots; Burst before Skill when available.' },
+    { id:'clorinde', name:'Clorinde', element:'Electro', role:'Main DPS', weapon:'Sword', icon:'UI_AvatarIcon_Clorinde_Circle', enkaId:10000098, tags:['quicken','electro','normal'], rotation:'Apply Dendro and buffs, then Burst → Skill stance → alternate lunges and shots.' },
+    { id:'gaming', name:'Gaming', element:'Pyro', role:'Main DPS', weapon:'Claymore', icon:'UI_AvatarIcon_Gaming_Circle', enkaId:10000095, tags:['plunge','vaporize','pyro'], rotation:'Apply Hydro and buffs, then Burst → Skill → plunge; repeat Skill after the reset.' },
+    { id:'mualani', name:'Mualani', element:'Hydro', role:'Main DPS', weapon:'Catalyst', icon:'UI_AvatarIcon_Mualani_Circle', enkaId:10000102, tags:['vaporize','hydro','natlan'], rotation:'Apply Pyro and buffs, enter sharky mode, build bite stacks → enhanced bite → Burst.' },
+    { id:'furina', name:'Furina', element:'Hydro', role:'Support', weapon:'Sword', icon:'UI_AvatarIcon_Furina_Circle', enkaId:10000089, tags:['hydro','vaporize','freeze','buff','healer-synergy'], rotation:'Skill to summon Salon Members → Burst; swap out and let team-wide healing support her buff.' },
+    { id:'nahida', name:'Nahida', element:'Dendro', role:'Support', weapon:'Catalyst', icon:'UI_AvatarIcon_Nahida_Circle', enkaId:10000073, tags:['dendro','quicken','hyperbloom','bloom','buff'], rotation:'Hold Skill to mark enemies → Burst, then swap to trigger reactions.' },
+    { id:'bennett', name:'Bennett', element:'Pyro', role:'Support', weapon:'Sword', icon:'UI_AvatarIcon_Bennett_Circle', enkaId:10000032, tags:['pyro','buff','healer','energy','mono-pyro'], rotation:'Burst to create the ATK-buff and healing field → Skill if energy is needed.' },
+    { id:'xiangling', name:'Xiangling', element:'Pyro', role:'Sub DPS', weapon:'Polearm', icon:'UI_AvatarIcon_Xiangling_Circle', enkaId:10000023, tags:['pyro','vaporize','off-field','energy','mono-pyro'], rotation:'Skill → Burst to snapshot buffs and apply off-field Pyro.' },
+    { id:'xingqiu', name:'Xingqiu', element:'Hydro', role:'Sub DPS', weapon:'Sword', icon:'UI_AvatarIcon_Xingqiu_Circle', enkaId:10000025, tags:['hydro','vaporize','freeze','off-field','damage-reduction'], rotation:'Skill → Burst, then swap to your on-field attacker for coordinated Hydro hits.' },
+    { id:'fischl', name:'Fischl', element:'Electro', role:'Sub DPS', weapon:'Bow', icon:'UI_AvatarIcon_Fischl_Circle', enkaId:10000031, tags:['electro','off-field','quicken','electrocharged','energy'], rotation:'Skill or Burst to summon Oz; refresh Oz when the summon expires.' },
+    { id:'kazuha', name:'Kaedehara Kazuha', aliases:['Kazuha'], element:'Anemo', role:'Support', weapon:'Sword', icon:'UI_AvatarIcon_Kazuha_Circle', enkaId:10000047, tags:['swirl','buff','hydro','pyro','electro','cryo','grouping'], rotation:'Apply the carry element → Skill plunge to Swirl and buff → Burst if useful.' },
+    { id:'zhongli', name:'Zhongli', element:'Geo', role:'Sustain', weapon:'Polearm', icon:'UI_AvatarIcon_Zhongli_Circle', enkaId:10000030, tags:['geo','shield','resistance','comfort'], rotation:'Hold Skill to create the shield and resistance shred; Burst when safe or useful.' },
+    { id:'kokomi', name:'Sangonomiya Kokomi', aliases:['Kokomi'], element:'Hydro', role:'Sustain', weapon:'Catalyst', icon:'UI_AvatarIcon_Kokomi_Circle', enkaId:10000054, tags:['hydro','healer','freeze','bloom','off-field'], rotation:'Skill to place the jellyfish for healing and Hydro; Burst to refresh it when needed.' },
+    { id:'baizhu', name:'Baizhu', element:'Dendro', role:'Sustain', weapon:'Catalyst', icon:'UI_AvatarIcon_Baizhuer_Circle', enkaId:10000082, tags:['dendro','healer','shield','quicken','bloom'], rotation:'Skill for team healing → Burst for shields and Dendro application.' },
+    { id:'yelan', name:'Yelan', element:'Hydro', role:'Sub DPS', weapon:'Bow', icon:'UI_AvatarIcon_Yelan_Circle', enkaId:10000060, tags:['hydro','vaporize','off-field','buff','freeze'], rotation:'Skill → Burst, then swap to your on-field attacker for coordinated Hydro attacks.' },
+    { id:'sucrose', name:'Sucrose', element:'Anemo', role:'Support', weapon:'Catalyst', icon:'UI_AvatarIcon_Sucrose_Circle', enkaId:10000043, tags:['swirl','buff','grouping','vaporize','electrocharged'], rotation:'Apply an element → Skill/Burst to Swirl and share Elemental Mastery.' },
+    { id:'diona', name:'Diona', element:'Cryo', role:'Sustain', weapon:'Bow', icon:'UI_AvatarIcon_Diona_Circle', enkaId:10000039, tags:['cryo','shield','healer','freeze'], rotation:'Hold Skill for a shield → Burst for healing and Cryo application.' },
+    { id:'layla', name:'Layla', element:'Cryo', role:'Sustain', weapon:'Sword', icon:'UI_AvatarIcon_Layla_Circle', enkaId:10000074, tags:['cryo','shield','freeze'], rotation:'Skill to create the shield and Night Stars; Burst for extra Cryo application.' },
+    { id:'thoma', name:'Thoma', element:'Pyro', role:'Sustain', weapon:'Polearm', icon:'UI_AvatarIcon_Tohma_Circle', enkaId:10000050, tags:['pyro','shield','burgeon','normal'], rotation:'Skill → Burst to establish the shield; use Normal Attacks to refresh it.' },
+    { id:'chevreuse', name:'Chevreuse', element:'Pyro', role:'Support', weapon:'Polearm', icon:'UI_AvatarIcon_Chevreuse_Circle', enkaId:10000088, tags:['pyro','electro','overload','buff','healer'], rotation:'Trigger Overload with Pyro/Electro → Skill for healing and buffs → Burst.' },
+    { id:'ororon', name:'Ororon', element:'Electro', role:'Sub DPS', weapon:'Bow', icon:'UI_AvatarIcon_Olorun_Circle', enkaId:10000105, remoteSlug:'ororon', imageUrls:['https://genshin.jmp.blue/characters/ororon/icon-big','https://genshin.jmp.blue/characters/ororon/portrait','https://static.nanoka.cc/gi/UI/UI_AvatarIcon_Olorun_Circle.webp','https://gi.yatta.moe/assets/UI/UI_AvatarIcon_Olorun_Circle.png','https://enka.network/ui/UI_AvatarIcon_Olorun_Circle.png'], tags:['electro','off-field','electrocharged','natlan'], rotation:'Apply Hydro or Electro → Skill → Burst for off-field Electro support.' },
+    { id:'xilonen', name:'Xilonen', element:'Geo', role:'Support', weapon:'Sword', icon:'UI_AvatarIcon_Xilonen_Circle', enkaId:10000101, tags:['geo','buff','resistance','healer'], rotation:'Use Skill and Nightsoul attacks to activate resistance shred → Burst for healing.' },
+    { id:'chiori', name:'Chiori', element:'Geo', role:'Sub DPS', weapon:'Sword', icon:'UI_AvatarIcon_Chiori_Circle', enkaId:10000094, tags:['geo','off-field','quick-swap','crystallize'], rotation:'Skill to summon Tamoto → swap to another character; Burst when available.' },
+    { id:'citlali', name:'Citlali', element:'Cryo', role:'Support', weapon:'Catalyst', icon:'UI_AvatarIcon_Citlali_Circle', enkaId:10000110, tags:['cryo','shield','vaporize','pyro','buff'], rotation:'Skill to summon support spirits and shield → Burst for Cryo application.' },
+    { id:'emilie', name:'Emilie', element:'Dendro', role:'Sub DPS', weapon:'Polearm', icon:'UI_AvatarIcon_Emilie_Circle', enkaId:10000097, tags:['dendro','burning','off-field'], rotation:'Place Lumidouce Case with Skill → Burst to reposition or refresh it.' },
+    { id:'nilou', name:'Nilou', element:'Hydro', role:'Support', weapon:'Sword', icon:'UI_AvatarIcon_Nilou_Circle', enkaId:10000070, tags:['hydro','bloom','dendro'], rotation:'Use Skill sequence to activate the dance aura or Hydro ring → Burst.' },
+    { id:'collei', name:'Collei', element:'Dendro', role:'Support', weapon:'Bow', icon:'UI_AvatarIcon_Collei_Circle', enkaId:10000062, tags:['dendro','bloom','quicken','off-field'], rotation:'Skill → Burst to apply Dendro, then swap to the reaction driver.' },
+    { id:'beidou', name:'Beidou', element:'Electro', role:'Sub DPS', weapon:'Claymore', icon:'UI_AvatarIcon_Beidou_Circle', enkaId:10000024, tags:['electro','off-field','electrocharged','normal'], rotation:'Skill to counter if possible → Burst; swap to a fast Normal Attacker.' },
+    { id:'rosaria', name:'Rosaria', element:'Cryo', role:'Sub DPS', weapon:'Polearm', icon:'UI_AvatarIcon_Rosaria_Circle', enkaId:10000045, tags:['cryo','freeze','off-field','crit-buff'], rotation:'Skill behind the enemy → Burst for persistent Cryo application.' }
+  ];
+
+  const demoOwned = ['neuvillette','furina','fischl','kazuha','bennett','xiangling','xingqiu','nahida','raiden','zhongli','kokomi','yelan','sucrose','diona'];
+  const elements = {
+    Pyro: { symbol:'♨', tint:'#e98c72' }, Hydro: { symbol:'◉', tint:'#78bde8' }, Electro: { symbol:'ϟ', tint:'#b79be8' },
+    Cryo: { symbol:'❄', tint:'#9ed8e4' }, Dendro: { symbol:'❋', tint:'#9fc779' }, Anemo: { symbol:'〰', tint:'#8acdb8' }, Geo: { symbol:'⬡', tint:'#d8b979' }
+  };
+  const accents = [
+    { id:'mondstadt', name:'Mondstadt', color:'#9bc9ae' }, { id:'liyue', name:'Liyue', color:'#d7ad68' },
+    { id:'inazuma', name:'Inazuma', color:'#b4a0e3' }, { id:'sumeru', name:'Sumeru', color:'#95c98a' },
+    { id:'fontaine', name:'Fontaine', color:'#77c8d5' }, { id:'natlan', name:'Natlan', color:'#e58a75' },
+    { id:'snezhnaya', name:'Snezhnaya', color:'#a4c4e8' }, { id:'khaenriah', name:'Khaenri’ah', color:'#9ca9d8' }
+  ];
+  // Curated starter synergies. Keep these lists short and review them as character kits change.
+  const preferences = {
+    neuvillette:['furina','kazuha','fischl','zhongli','baizhu','ororon','sucrose'],
+    arlecchino:['bennett','xingqiu','yelan','kazuha','zhongli','citlali','fischl'],
+    raiden:['bennett','xiangling','xingqiu','yelan','kazuha','nahida','chevreuse'],
+    hutao:['xingqiu','yelan','furina','zhongli','kazuha','layla','diona'],
+    xiao:['bennett','zhongli','sucrose','diona','layla','furina'],
+    navia:['bennett','furina','xiangling','fischl','zhongli','chiori','xilonen'],
+    alhaitham:['nahida','fischl','raiden','baizhu','xingqiu','yelan'],
+    ayaka:['kokomi','kazuha','diona','layla','rosaria','furina','xingqiu'],
+    wanderer:['bennett','zhongli','diona','layla','sucrose','faruzan'],
+    lyney:['bennett','xiangling','kazuha','zhongli','chevreuse','fischl'],
+    clorinde:['nahida','fischl','baizhu','kazuha','chevreuse','ororon'],
+    gaming:['furina','xingqiu','yelan','bennett','sucrose','kazuha'],
+    mualani:['xiangling','kazuha','xilonen','citlali','furina','nahida']
+  };
+  characters.forEach(character => { character.preferred = preferences[character.id] || []; });
+  const profileAvatarIds = Object.fromEntries(characters.filter(c => c.enkaId).map(c => [String(c.enkaId), c]));
+  return { characters, demoOwned, elements, accents, profileAvatarIds };
+})();
+
+  </script>
+  <script>
+/* Embedded team recommendation engine */
+/* STARGLOW / PART 4 OF 5
+ * Lightweight explainable team-scoring prototype. This is not a remote AI model.
+ * Swap this module for a server-side LLM/game-logic service when you are ready.
+ */
+window.StarglowEngine = (() => {
+  const intersectCount = (a = [], b = []) => a.filter(tag => b.includes(tag)).length;
+
+  function explainTeam(main, teammates) {
+    const elements = [...new Set(teammates.map(c => c.element))];
+    const roles = teammates.map(c => c.role);
+    const notes = [];
+    if (roles.includes('Sustain')) notes.push('A sustain option is included for healing or shielding.');
+    else notes.push('This lineup has no dedicated sustain; add a healer or shielder if survivability is a problem.');
+    if (roles.includes('Support')) notes.push('A support slot brings buffs, grouping or resistance utility.');
+    if (elements.length > 1) notes.push(`The team has ${elements.length + (elements.includes(main.element) ? 0 : 1)} elements available for reaction options.`);
+    if (main.tags.includes('hypercarry')) notes.push(`${main.name} is treated as the on-field focus, so the suggested rotation sets up teammates first.`);
+    if (main.tags.includes('quicken') || main.tags.includes('spread')) notes.push('Dendro/Electro application is prioritized for Quicken-style uptime.');
+    if (main.tags.includes('vaporize')) notes.push('Hydro application is valued to enable Vaporize opportunities.');
+    return notes.join(' ');
+  }
+
+  function candidateScore(main, candidate, selected) {
+    let score = 1;
+    const currentRoles = selected.map(c => c.role);
+    const currentTags = selected.flatMap(c => c.tags);
+    score += intersectCount(main.tags, candidate.tags) * 4;
+    const preferredIndex = (main.preferred || []).indexOf(candidate.id);
+    if (preferredIndex >= 0) score += Math.max(7, 15 - preferredIndex * 1.4);
+    score += intersectCount(candidate.tags, currentTags) * 1.2;
+
+    if (!currentRoles.includes('Sustain') && candidate.role === 'Sustain') score += 5;
+    if (!currentRoles.includes('Support') && candidate.role === 'Support') score += 6;
+    if (!currentRoles.includes('Sub DPS') && candidate.role === 'Sub DPS') score += 5;
+    if (currentRoles.includes(candidate.role) && candidate.role === 'Sustain') score -= 1;
+    if (currentRoles.filter(role => role === candidate.role).length >= 2) score -= 3;
+    if (candidate.element === main.element && ['Main DPS','Sub DPS'].includes(candidate.role)) score -= 1.5;
+
+    const combined = [...selected, candidate];
+    const elements = new Set(combined.map(c => c.element));
+    if (elements.size >= 3) score += .7;
+    if (main.element === 'Geo' && candidate.tags.includes('crystallize')) score += 3;
+    if (main.element === 'Dendro' && candidate.element === 'Electro') score += 4;
+    if (main.element === 'Hydro' && candidate.element === 'Dendro') score += 3;
+    if (main.element === 'Pyro' && candidate.element === 'Hydro') score += 4;
+    if (main.element === 'Cryo' && candidate.element === 'Hydro') score += 4;
+    return score;
+  }
+
+  function buildTeam(mainId, ownedIds, catalog) {
+    const byId = new Map(catalog.map(c => [c.id, c]));
+    const main = byId.get(mainId);
+    if (!main) return { error:'Choose a main character first.' };
+    if (main.teamEligible === false) return { error:'This is a special Wonderland avatar and is not supported by standard combat-team recommendations.' };
+    const ownedUnique = [...new Set(ownedIds)].filter(id => byId.has(id));
+    if (!ownedUnique.includes(mainId)) return { error:'Your selected main is not marked as owned. Add them to your roster first.' };
+    const pool = ownedUnique.filter(id => id !== mainId).map(id => byId.get(id)).filter(character => character.teamEligible !== false);
+    if (pool.length < 3) return { error:`You need at least 4 owned characters in total. Your roster currently has ${ownedUnique.length}.` };
+
+    const picked = [];
+    while (picked.length < 3) {
+      const next = pool
+        .filter(candidate => !picked.some(item => item.id === candidate.id))
+        .map(candidate => ({ candidate, score:candidateScore(main, candidate, picked) }))
+        .sort((a,b) => b.score - a.score || a.candidate.name.localeCompare(b.candidate.name))[0];
+      if (!next) break;
+      picked.push(next.candidate);
+    }
+
+    // Set-up characters go first; the selected main is always last.
+    const setupOrder = { 'Sustain':1, 'Support':2, 'Sub DPS':3, 'Main DPS':4 };
+    const rotationOrder = [...picked].sort((a,b) => (setupOrder[a.role] || 3) - (setupOrder[b.role] || 3));
+    rotationOrder.push(main);
+    return {
+      main,
+      teammates:picked,
+      lineup:[main, ...picked],
+      rotation:rotationOrder,
+      explanation:explainTeam(main, picked),
+      generatedAt:Date.now()
+    };
+  }
+
+  return { buildTeam };
+})();
+
+  </script>
+  <script>
+/* Embedded Starglow application */
+/* STARGLOW / PART 5 OF 5
+ * UI state, visual portrait scanner, Enka lookup, rewards and cosmetics.
+ */
+(() => {
+  'use strict';
+  const DATA = window.StarglowData;
+  const ENGINE = window.StarglowEngine;
+  const $ = (selector) => document.querySelector(selector);
+  const $$ = (selector) => [...document.querySelectorAll(selector)];
+  const STORE_KEY = 'starglow:v1';
+  const DAILY_KEY = 'starglow:daily';
+  const CATALOG_BASE = 'https://genshin.jmp.blue';
+  const CATALOG_CACHE_KEY = 'starglow:catalog:cache:v4';
+  const CATALOG_CHECK_KEY = 'starglow:catalog:last-success:v4';
+  const CATALOG_CHECK_INTERVAL = 12 * 60 * 60 * 1000;
+  const CATALOG_RETRY_INTERVAL = 10 * 60 * 1000;
+  const CATALOG_MIN_COMPLETE = 80;
+  const CATALOG_SOURCES = [
+    { name:'Project Amber', url:'https://api.ambr.top/v2/en/avatar', kind:'ambr' },
+    { name:'Project Amber mirror', url:'https://gi.yatta.moe/api/v2/en/avatar', kind:'ambr' },
+    { name:'GenshinDB', url:'https://genshin-db-api.vercel.app/api/v5/characters?query=names&matchCategories=true&verboseCategories=true&queryLanguages=english&resultLanguage=English', kind:'generic' },
+    { name:'genshin.dev', url:'https://genshin.jmp.blue/characters/all?lang=en', kind:'generic' }
+  ];
+  let catalogSyncPromise = null;
+  let catalogInterval = null;
+  const THEMES = [
+    { id:'starlit', name:'Starlit', description:'A quiet night sky with a soft silver glow.', price:0, themeBg:'linear-gradient(135deg,#252b38,#11131a)', glow:'rgba(150,190,220,.55)' },
+    { id:'aurora', name:'Aurora Veil', description:'Cool teal light drifting across the horizon.', price:90, themeBg:'linear-gradient(135deg,#1d3940,#101820)', glow:'rgba(126,205,192,.65)' },
+    { id:'embers', name:'Emberfall', description:'Warm dusk tones with a little firelight.', price:120, themeBg:'linear-gradient(135deg,#442c30,#171317)', glow:'rgba(235,123,95,.65)' },
+    { id:'jade', name:'Jade Reverie', description:'A calm green palette inspired by ancient forests.', price:150, themeBg:'linear-gradient(135deg,#243a32,#101814)', glow:'rgba(144,192,120,.65)' },
+    { id:'moonlit', name:'Moonlit Oath', description:'A midnight-indigo look with celestial details.', price:180, themeBg:'linear-gradient(135deg,#2a2d4a,#11131d)', glow:'rgba(148,164,222,.7)' }
+  ];
+  const DEFAULT_STATE = {
+    owned:[],
+    mode:'dark', accent:'fontaine', gems:120,
+    purchased:['starlit'], equipped:'starlit',
+    travelerElements:{'traveler-aether':'Anemo','traveler-lumine':'Anemo'},
+    profile:null, lastTeam:null
+  };
+  let state = loadState();
+  let selectedFiles = [];
+  let toastTimer = null;
+  let currentTeam = null;
+
+  function loadState() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(STORE_KEY) || 'null');
+      if (!saved) return structuredClone(DEFAULT_STATE);
+      const savedOwned = Array.isArray(saved.owned) ? [...new Set(saved.owned)] : [];
+      const savedSet = new Set(savedOwned);
+      const wasUntouchedDemo = Array.isArray(DATA.demoOwned) && savedOwned.length === DATA.demoOwned.length && DATA.demoOwned.every(id => savedSet.has(id));
+      return { ...structuredClone(DEFAULT_STATE), ...saved,
+        owned:wasUntouchedDemo ? [] : savedOwned.map(id => id === 'traveler' ? 'traveler-aether' : id),
+        travelerElements:{...DEFAULT_STATE.travelerElements,...(saved.travelerElements || {})},
+        lastTeam:wasUntouchedDemo ? null : (saved.lastTeam || null),
+        purchased:Array.isArray(saved.purchased) ? [...new Set(['starlit',...saved.purchased])] : ['starlit'] };
+    } catch { return structuredClone(DEFAULT_STATE); }
+  }
+  function saveState() { localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
+  function toast(message) {
+    const el = $('#toast'); el.textContent = message; el.classList.add('show');
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
+  }
+  function escapeHTML(value='') {
+    return String(value).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+  }
+  function getCharacter(id) { return DATA.characters.find(c => c.id === id); }
+
+  // 122 released roster entries plus Traveler and the two Wonderland avatars are bundled
+  // so Starglow never falls back to the old 38-character starter list when APIs are unavailable.
+  // Online feeds enrich these entries with official asset IDs, rarity and portraits.
+  const BASELINE_ROSTER = `Jahoda|Anemo|Bow\nChasca|Anemo|Bow\nFaruzan|Anemo|Bow\nVenti|Anemo|Bow\nPrune|Anemo|Catalyst\nIfa|Anemo|Catalyst\nYumemizuki Mizuki|Anemo|Catalyst\nLan Yan|Anemo|Catalyst\nXianyun|Anemo|Catalyst\nWanderer|Anemo|Catalyst\nShikanoin Heizou|Anemo|Catalyst\nSucrose|Anemo|Catalyst\nVarka|Anemo|Claymore\nSayu|Anemo|Claymore\nXiao|Anemo|Polearm\nVesna|Anemo|Sword\nLynette|Anemo|Sword\nKaedehara Kazuha|Anemo|Sword\nJean|Anemo|Sword\nLinnea|Geo|Bow\nGorou|Geo|Bow\nNingguang|Geo|Catalyst\nNavia|Geo|Claymore\nArataki Itto|Geo|Claymore\nNoelle|Geo|Claymore\nIlluga|Geo|Polearm\nKachina|Geo|Polearm\nYun Jin|Geo|Polearm\nZhongli|Geo|Polearm\nZibai|Geo|Sword\nXilonen|Geo|Sword\nChiori|Geo|Sword\nAlbedo|Geo|Sword\nOroron|Electro|Bow\nSethos|Electro|Bow\nKujou Sara|Electro|Bow\nFischl|Electro|Bow\nMitya|Electro|Catalyst\nVaresa|Electro|Catalyst\nYae Miko|Electro|Catalyst\nLisa|Electro|Catalyst\nDori|Electro|Claymore\nRazor|Electro|Claymore\nBeidou|Electro|Claymore\nAlyosha|Electro|Polearm\nFlins|Electro|Polearm\nIneffa|Electro|Polearm\nIansan|Electro|Polearm\nCyno|Electro|Polearm\nRaiden Shogun|Electro|Polearm\nValeriy|Electro|Sword\nClorinde|Electro|Sword\nKuki Shinobu|Electro|Sword\nKeqing|Electro|Sword\nTighnari|Dendro|Bow\nCollei|Dendro|Bow\nNefer|Dendro|Catalyst\nLauma|Dendro|Catalyst\nBaizhu|Dendro|Catalyst\nNahida|Dendro|Catalyst\nKinich|Dendro|Claymore\nKaveh|Dendro|Claymore\nEmilie|Dendro|Polearm\nYaoyao|Dendro|Polearm\nKirara|Dendro|Sword\nAlhaitham|Dendro|Sword\nSigewinne|Hydro|Bow\nYelan|Hydro|Bow\nTartaglia|Hydro|Bow\nVodyanitsa|Hydro|Catalyst\nColumbina|Hydro|Catalyst\nMualani|Hydro|Catalyst\nNeuvillette|Hydro|Catalyst\nSangonomiya Kokomi|Hydro|Catalyst\nMona|Hydro|Catalyst\nBarbara|Hydro|Catalyst\nAino|Hydro|Claymore\nCandace|Hydro|Polearm\nDahlia|Hydro|Sword\nFurina|Hydro|Sword\nNilou|Hydro|Sword\nKamisato Ayato|Hydro|Sword\nXingqiu|Hydro|Sword\nLyney|Pyro|Bow\nYoimiya|Pyro|Bow\nAmber|Pyro|Bow\nNicole|Pyro|Catalyst\nYanfei|Pyro|Catalyst\nKlee|Pyro|Catalyst\nMavuika|Pyro|Claymore\nGaming|Pyro|Claymore\nDehya|Pyro|Claymore\nXinyan|Pyro|Claymore\nDiluc|Pyro|Claymore\nArlecchino|Pyro|Polearm\nChevreuse|Pyro|Polearm\nThoma|Pyro|Polearm\nHu Tao|Pyro|Polearm\nXiangling|Pyro|Polearm\nDurin|Pyro|Sword\nBennett|Pyro|Sword\nAloy|Cryo|Bow\nGanyu|Cryo|Bow\nDiona|Cryo|Bow\nCitlali|Cryo|Catalyst\nCharlotte|Cryo|Catalyst\nWriothesley|Cryo|Catalyst\nSandrone|Cryo|Claymore\nFreminet|Cryo|Claymore\nEula|Cryo|Claymore\nChongyun|Cryo|Claymore\nLohen|Cryo|Polearm\nEscoffier|Cryo|Polearm\nMika|Cryo|Polearm\nShenhe|Cryo|Polearm\nRosaria|Cryo|Polearm\nOdette|Cryo|Sword\nSkirk|Cryo|Sword\nLayla|Cryo|Sword\nKamisato Ayaka|Cryo|Sword\nQiqi|Cryo|Sword\nKaeya|Cryo|Sword`.split('\n').map(line => line.split('|'));
+  const ROSTER_NAME_ALIASES = {
+    'Kaedehara Kazuha':['Kazuha'], 'Arataki Itto':['Itto'], 'Kamisato Ayaka':['Ayaka'],
+    'Kamisato Ayato':['Ayato'], 'Raiden Shogun':['Raiden','Ei'], 'Sangonomiya Kokomi':['Kokomi'],
+    'Tartaglia':['Childe'], 'Yae Miko':['Miko'], 'Shikanoin Heizou':['Heizou'],
+    'Kuki Shinobu':['Shinobu'], 'Kujou Sara':['Sara'], 'Yumemizuki Mizuki':['Mizuki']
+  };
+  const ROSTER_ICON_ALIASES = {
+    'Amber':'Ambor','Jean':'Qin','Noelle':'Noel','Yanfei':'Feiyan',
+    'Alhaitham':'Alhatham','Baizhu':'Baizhuer','Lyney':'Liney','Ororon':'Olorun',
+    'Raiden Shogun':'Shougun','Hu Tao':'Hutao','Yae Miko':'Yae','Arataki Itto':'Itto',
+    'Kuki Shinobu':'Shinobu','Kujou Sara':'Sara','Kaedehara Kazuha':'Kazuha',
+    'Kamisato Ayaka':'Ayaka','Kamisato Ayato':'Ayato','Sangonomiya Kokomi':'Kokomi',
+    'Shikanoin Heizou':'Heizo','Yumemizuki Mizuki':'Mizuki','Yun Jin':'Yunjin',
+    'Xianyun':'Liuyun','Kirara':'Momoka'
+  };
+  const ROSTER_SLUG_ALIASES = {
+    'Kaedehara Kazuha':'kazuha','Arataki Itto':'itto','Kamisato Ayaka':'ayaka',
+    'Kamisato Ayato':'ayato','Raiden Shogun':'raiden','Sangonomiya Kokomi':'kokomi',
+    'Yae Miko':'yae-miko','Hu Tao':'hutao','Tartaglia':'tartaglia',
+    'Shikanoin Heizou':'heizou','Kuki Shinobu':'shinobu','Kujou Sara':'sara',
+    'Yumemizuki Mizuki':'mizuki','Yun Jin':'yunjin','Xianyun':'xianyun',
+    'Kirara':'kirara','Amber':'amber','Jean':'jean','Noelle':'noelle','Yanfei':'yanfei'
+  };
+  function ensureBaselineRoster() {
+    for (const [name, element, weapon] of BASELINE_ROSTER) {
+      const slug = catalogSlug(ROSTER_SLUG_ALIASES[name] || name);
+      const aliases = ROSTER_NAME_ALIASES[name] || [];
+      const matchNames = new Set([name, slug, ...aliases].map(catalogNameKey));
+      let character = DATA.characters.find(item => [item.id,item.name,...(item.aliases || [])].some(value => matchNames.has(catalogNameKey(value))));
+      const iconToken = ROSTER_ICON_ALIASES[name] || '';
+      // Plain UI_AvatarIcon_<name>.png is the transparent front-facing head portrait.
+      // Side_ is the angled icon; _Circle is the circular profile-picture crop.
+      const icon = iconToken ? `UI_AvatarIcon_${iconToken}` : '';
+      const imageUrls = icon ? [
+        `https://enka.network/ui/${icon}.png`,
+        `https://gi.yatta.moe/assets/UI/${icon}.png`,
+        `https://api.ambr.top/assets/UI/${icon}.png`
+      ] : [`${CATALOG_BASE}/characters/${encodeURIComponent(slug)}/icon`];
+      if (character) {
+        if (!character.element || character.element === 'Unknown') character.element = element;
+        if (!character.weapon || character.weapon === 'Unknown') character.weapon = weapon;
+        character.aliases = [...new Set([...(character.aliases || []), ...aliases])];
+        character.remoteSlug = character.remoteSlug || slug;
+        character.icon = character.icon || icon;
+        character.imageUrls = [...new Set([...(character.imageUrls || []), ...imageUrls])];
+        character.remoteSlugAliases = [...new Set([...(character.remoteSlugAliases || []), ...(ROSTER_SLUG_ALIASES[name] ? [catalogSlug(name)] : [])])];
+      } else {
+        DATA.characters.push({
+          id:slug, name, aliases, element, role:'Unclassified', weapon,
+          icon, frontIcon:icon, enkaId:null, remoteSlug:slug,
+          remoteSlugAliases:ROSTER_SLUG_ALIASES[name] ? [catalogSlug(name)] : [],
+          imageUrls, rarity:null, nation:'', region:'', title:'', description:'',
+          tags:[], preferred:[], skills:[], passives:[], constellations:[],
+          rotation:'New roster entry: use teammates’ support abilities first, then use this character’s Skill and Burst when they fit your team. Detailed rotations will be added as this character is reviewed.'
+        });
+      }
+    }
+    // Keep Aether and Lumine as two independent roster cards. Their element
+    // selections are stored separately in state.travelerElements.
+    DATA.characters = DATA.characters.filter(item => !['traveler','traveler-aether','traveler-lumine'].includes(item.id));
+    for (const traveler of [
+      {id:'traveler-aether',name:'Aether',icon:'UI_AvatarIcon_PlayerBoy',gender:'male'},
+      {id:'traveler-lumine',name:'Lumine',icon:'UI_AvatarIcon_PlayerGirl',gender:'female'}
+    ]) {
+      const savedElement = state.travelerElements?.[traveler.id];
+      const element = ['Anemo','Geo','Electro','Dendro','Hydro','Pyro'].includes(savedElement) ? savedElement : 'Anemo';
+      DATA.characters.push({
+        id:traveler.id, name:traveler.name, aliases:[traveler.name], element,
+        role:'Main DPS', weapon:'Sword', icon:traveler.icon, frontIcon:traveler.icon,
+        enkaId:null, remoteSlug:'traveler', imageUrls:[`https://enka.network/ui/${traveler.icon}.png`,`https://gi.yatta.moe/assets/UI/${traveler.icon}.png`],
+        rarity:5, nation:'Unknown', region:'Unknown', gender:traveler.gender,
+        description:`${traveler.name} can resonate with different elements at Statues of The Seven.`,
+        tags:['traveler','flexible',traveler.gender], preferred:[], skills:[], passives:[], constellations:[],
+        rotation:'Traveler’s rotation depends on the selected element. Set up teammates first, then use Skill and Burst.'
+      });
+    }
+    // Miliastra Wonderland avatars are special selectable characters and do not
+    // use the standard Enka UI_AvatarIcon_<name>.png asset convention.
+    // These two upright front-facing icon files were verified from the
+    // community game-asset archive; do not replace them with side/profile art.
+    const wonderlandPortraits = [
+      {
+        id:'wonderland-manekin', name:'Manekin', aliases:['Wonderland Manekin','Manekin (male)'],
+        portrait:'https://pack.skowt.cc/asset/01a11fab-c324-71de-b6e4-0abe41311025-preview.webp'
+      },
+      {
+        id:'wonderland-manekina', name:'Manekina', aliases:['Wonderland Manekina','Manekina (female)'],
+        portrait:'https://pack.skowt.cc/asset/01a11fab-d3c2-72ef-94c3-1f7051fb3d2e-preview.webp'
+      }
+    ];
+    for (const entry of wonderlandPortraits) {
+      let character = DATA.characters.find(item =>
+        catalogNameKey(item.name) === catalogNameKey(entry.name) ||
+        (item.aliases || []).some(alias => catalogNameKey(alias) === catalogNameKey(entry.name))
+      );
+      if (!character) {
+        character = {
+          id:entry.id, name:entry.name, aliases:[...entry.aliases], element:'Adaptive',
+          role:'Special avatar', weapon:'Sword', nation:'Miliastra Wonderland', region:'Miliastra Wonderland',
+          rarity:null, title:'Wonderland Avatar', description:'A customizable player avatar from Miliastra Wonderland.',
+          tags:['wonderland','customizable-avatar'], preferred:[], skills:[], passives:[], constellations:[],
+          rotation:'Special Wonderland avatar; not included in standard combat-team recommendations.',
+          teamEligible:false
+        };
+        DATA.characters.push(character);
+      }
+      character.aliases = [...new Set([...(character.aliases || []), ...entry.aliases])];
+      character.portraitDirectUrls = [entry.portrait];
+      character.teamEligible = false;
+      character.role = 'Special avatar';
+      character.nation = character.nation || 'Miliastra Wonderland';
+      character.region = character.region || 'Miliastra Wonderland';
+    }
+    DATA.characters.sort((a,b) => a.name.localeCompare(b.name));
+  }
+  function frontFacingAssetName(value) {
+    let asset=String(value||'').trim();
+    if(!asset) return '';
+    if(/^https?:\/\//i.test(asset)) {
+      try { asset=decodeURIComponent(new URL(asset).pathname.split('/').pop()||''); }
+      catch { return ''; }
+    }
+    asset=asset.replace(/^\/?ui\//i,'').replace(/\.(png|webp|jpe?g)$/i,'').replace(/_Circle$/i,'');
+    // Enka exposes both UI_AvatarIcon_<token> (front) and
+    // UI_AvatarIcon_Side_<token> (angled). Normalize the latter to the former.
+    asset=asset.replace(/^UI_AvatarIcon_Side_/i,'UI_AvatarIcon_');
+    asset=asset.replace(/^Side_/i,'');
+    if(/^UI_AvatarIcon_/i.test(asset)) return asset;
+    return `UI_AvatarIcon_${asset}`;
+  }
+  function characterImageCandidates(character) {
+    const urls=[];
+    const addUrl=value=>{const url=String(value||'').trim();if(/^https?:\/\//i.test(url))urls.push(url);};
+    const addFrontAsset=value=>{
+      const front=frontFacingAssetName(value);
+      if(!front)return;
+      const encoded=encodeURIComponent(front);
+      urls.push(`https://enka.network/ui/${encoded}.png`);
+      urls.push(`https://gi.yatta.moe/assets/UI/${encoded}.png`);
+      urls.push(`https://api.ambr.top/assets/UI/${encoded}.png`);
+    };
+
+    // Explicit portrait overrides are used only for special game assets whose
+    // icons are not present in the standard Enka avatar manifest.
+    for (const value of (character?.portraitDirectUrls || [])) addUrl(value);
+
+    // Always prefer the plain front-facing HoYoverse head portrait. Side_ assets
+    // are angled icons and are normalized back to the standard front icon here.
+    addFrontAsset(character?.frontIcon || '');
+    addFrontAsset(character?.icon || '');
+    addFrontAsset(character?.sideIcon || '');
+
+    // Keep only catalog URLs that identify a front avatar icon or a generic /icon
+    // endpoint. Exclude Side_ icons, splash art, posters, and full-body portraits.
+    if(Array.isArray(character?.imageUrls)) {
+      for(const value of character.imageUrls) {
+        const url=String(value||'').trim();
+        if(!/^https?:\/\//i.test(url))continue;
+        let path='';try{path=decodeURIComponent(new URL(url).pathname);}catch{}
+        const file=(path.split('/').pop()||'');
+        if(/UI_AvatarIcon_(?!Side_)[^/]+\.png$/i.test(file) && !/_Circle\.png$/i.test(file)) addUrl(url);
+        else if(/\/icon$/i.test(path)) addUrl(url);
+      }
+    }
+
+    // Slug-based fallback is restricted to /icon. Never use icon-big or portrait
+    // endpoints because those are not the forward-facing head icon requested.
+    if(character?.remoteSlug) {
+      const slugs=[character.remoteSlug,...(character.remoteSlugAliases||[])];
+      for(const slug of [...new Set(slugs.filter(Boolean))]) {
+        const safeSlug=encodeURIComponent(String(slug).toLowerCase());
+        urls.push(`${CATALOG_BASE}/characters/${safeSlug}/icon`);
+      }
+    }
+    const direct=[...new Set(urls)];
+    return [...new Set([...direct,...direct.slice(0,6).map(url=>`https://wsrv.nl/?url=${encodeURIComponent(url)}`)])];
+  }
+  function imgURL(character) { return characterImageCandidates(character)[0] || ''; }
+  function characterArt(character, className='') {
+    const urls = characterImageCandidates(character);
+    const fallback = `<span class=\'character-fallback\'>${escapeHTML((character?.name || '?').slice(0,1))}</span>`;
+    const image = urls.length ? `<img loading="lazy" decoding="async" referrerpolicy="no-referrer" src="${escapeHTML(urls[0])}" data-fallbacks="${escapeHTML(JSON.stringify(urls.slice(1)))}" alt="${escapeHTML(character.name)}" onerror="const q=JSON.parse(this.dataset.fallbacks||'[]');if(q.length){this.dataset.fallbacks=JSON.stringify(q.slice(1));this.src=q[0]}else{this.remove();this.parentElement.innerHTML='${fallback}' }">` : fallback;
+    return `<div class="${className || 'character-art'}">${image}</div>`;
+  }
+  function applyAppearance() {
+    document.documentElement.dataset.mode = state.mode;
+    document.documentElement.dataset.accent = state.accent;
+    $('#modeSelect').value = state.mode;
+    renderAccents();
+    renderWallet();
+    applyProfileTheme();
+  }
+  function renderWallet() {
+    $('#walletBalance').textContent = state.gems;
+    $('#atelierBalance').textContent = state.gems;
+  }
+  function renderAccents() {
+    $('#accentPicker').innerHTML = DATA.accents.map(accent => `
+      <button class="accent-choice ${state.accent === accent.id ? 'active':''}" data-accent-choice="${accent.id}" type="button" title="${accent.name}">
+        <span class="accent-swatch" style="--swatch:${accent.color}"></span>${accent.name}
+      </button>`).join('');
+  }
+  const TRAVELER_ELEMENTS = ['Anemo','Geo','Electro','Dendro','Hydro','Pyro'];
+  function setTravelerElement(id, element) {
+    if (!['traveler-aether','traveler-lumine'].includes(id) || !TRAVELER_ELEMENTS.includes(element)) return;
+    state.travelerElements = {...state.travelerElements,[id]:element};
+    const character = getCharacter(id);
+    if (character) character.element = element;
+    saveState();
+    renderRoster();
+  }
+  function renderRoster() {
+    const query = $('#characterSearch').value.trim().toLowerCase();
+    const element = $('#elementFilter').value;
+    const ownedOnly = $('#showOwnedOnly').checked;
+    const filtered = DATA.characters.filter(c => {
+      const matchesName = c.name.toLowerCase().includes(query);
+      const matchesElement = element === 'all' || c.element === element;
+      const matchesOwned = !ownedOnly || state.owned.includes(c.id);
+      return matchesName && matchesElement && matchesOwned;
+    });
+    $('#characterGrid').innerHTML = filtered.map(character => {
+      const owned = state.owned.includes(character.id);
+      const detail = [character.element, character.weapon, character.nation || character.region, character.rarity ? `${character.rarity}★` : ''].filter(Boolean).join(' · ');
+      const title = [character.name, character.title, detail, character.affiliation, character.constellation, character.birthday, character.description || ''].filter(Boolean).join(' — ');
+      if (character.id === 'traveler-aether' || character.id === 'traveler-lumine') {
+        const options = TRAVELER_ELEMENTS.map(value => `<option value="${value}" ${character.element===value?'selected':''}>${value}</option>`).join('');
+        return `<div class="traveler-card ${owned?'owned':''}" title="${escapeHTML(title)}">
+          <button class="traveler-toggle" type="button" data-character-id="${escapeHTML(character.id)}" aria-pressed="${owned}" title="${escapeHTML((owned?'Remove from':'Add to') + ' your roster')}" >
+            <span class="owned-check">✓</span>${characterArt(character)}<strong>${escapeHTML(character.name)}</strong><small>${DATA.elements[character.element]?.symbol || '✧'} ${escapeHTML(character.element)} · 5★</small>
+          </button>
+          <label class="traveler-pick"><small>Element</small><select data-traveler-element="${escapeHTML(character.id)}" aria-label="${escapeHTML(character.name)} element">${options}</select></label>
+        </div>`;
+      }
+      return `<button class="character-card ${owned?'owned':''}" type="button" data-character-id="${escapeHTML(character.id)}" aria-pressed="${owned}" title="${escapeHTML((owned?'Remove from':'Add to') + ' your roster. ' + title)}">
+        <span class="owned-check">✓</span>${characterArt(character)}<strong>${escapeHTML(character.name)}</strong><small>${DATA.elements[character.element]?.symbol || '✧'} ${escapeHTML(character.element || 'Unknown')}${character.rarity ? ` · ${character.rarity}★` : ''}</small>
+      </button>`;
+    }).join('') || '<div class="rotation-empty">No characters match those filters.</div>';
+    $('#ownedCount').textContent = state.owned.length;
+    $('#totalCharacterCount').textContent = DATA.characters.length;
+    $('#rosterCatalogFootnote').textContent = `${DATA.characters.length} characters in your catalog · ${state.owned.length} marked owned`;
+    renderMainOptions();
+  }
+  function renderMainOptions() {
+    const select = $('#mainCharacter');
+    const previous = select.value;
+    const owned = DATA.characters.filter(c => state.owned.includes(c.id));
+    select.innerHTML = '<option value="">Choose from your roster…</option>' + owned.map(c => `<option value="${c.id}">${escapeHTML(c.name)} · ${c.element}</option>`).join('');
+    if (owned.some(c => c.id === previous)) select.value = previous;
+    else if (owned.some(c => c.id === 'neuvillette')) select.value = 'neuvillette';
+    else if (owned.length) select.value = owned[0].id;
+    renderMainPreview();
+  }
+  function renderCharacterDetails(character) {
+    const facts = [
+      ['Title',character.title], ['Element',character.element], ['Weapon',character.weapon],
+      ['Nation',character.nation || character.region], ['Rarity',character.rarity ? `${character.rarity}★` : ''],
+      ['Affiliation',character.affiliation], ['Constellation',character.constellation],
+      ['Birthday',character.birthday], ['Release',character.release], ['Combat role',character.role || 'Unclassified']
+    ].filter(([,value]) => value);
+    const factsHtml = facts.length ? `<div>${facts.map(([label,value]) => `<p><strong>${escapeHTML(label)}:</strong> ${escapeHTML(value)}</p>`).join('')}</div>` : '';
+    const renderEntries = (heading, entries) => Array.isArray(entries) && entries.length ? `<section class="character-details-section"><h4>${heading}</h4>${entries.map(item => `<div class="character-detail-item"><strong>${escapeHTML([item.unlock,item.name].filter(Boolean).join(' · ') || 'Detail')}</strong>${item.description ? `<span>${escapeHTML(item.description)}</span>` : ''}</div>`).join('')}</section>` : '';
+    const extra = [factsHtml, character.description ? `<p>${escapeHTML(character.description)}</p>` : '',
+      renderEntries('Talents',character.skills), renderEntries('Passive talents',character.passives), renderEntries('Constellations',character.constellations)
+    ].filter(Boolean).join('');
+    return extra ? `<details class="character-details"><summary>View character details and abilities</summary><div class="character-details-content">${extra}</div></details>` : '';
+  }
+  function renderMainPreview() {
+    const character = getCharacter($('#mainCharacter').value);
+    const preview = $('#mainPreview');
+    if (!character) {
+      preview.innerHTML = '<div class="main-preview-top"><div class="main-preview-orbit">✦</div><div><strong>Your main character goes here</strong><small>Pick an owned character to begin.</small></div></div>';
+      return;
+    }
+    const details = [character.title, character.element, character.weapon, character.nation || character.region, character.rarity ? `${character.rarity}★` : '', character.role || 'Unclassified'].filter(Boolean).join(' · ');
+    preview.innerHTML = `<div class="main-preview-top">${characterArt(character, 'main-preview-art')}<div class="main-preview-copy"><strong>${escapeHTML(character.name)}</strong><small>${escapeHTML(details)}</small></div></div>${renderCharacterDetails(character)}`;
+  }
+  function setOwned(id, owned) {
+    const next = new Set(state.owned);
+    if (owned) next.add(id); else next.delete(id);
+    state.owned = [...next];
+    saveState(); renderRoster();
+    if (!owned && $('#mainCharacter').value === id) renderMainPreview();
+  }
+
+  function catalogSlug(value) {
+    return String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim()
+      .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  }
+  function catalogNameKey(value) {
+    return String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '');
+  }
+  function displayNameFromSlug(slug) {
+    return String(slug || '').split('-').map(word => word ? word[0].toUpperCase() + word.slice(1) : '').join(' ');
+  }
+  function unwrapCatalogRecords(payload) {
+    if (Array.isArray(payload)) return payload.map((record, i) => ({ key:record?.slug || record?.key || (typeof record?.id === 'string' ? record.id : '') || record?.name || String(i), record }));
+    if (!payload || typeof payload !== 'object') return [];
+    if (Array.isArray(payload.characters)) return payload.characters.map((record, i) => ({ key:record?.slug || record?.key || (typeof record?.id === 'string' ? record.id : '') || record?.name || String(i), record }));
+    if (payload.characters && typeof payload.characters === 'object') return Object.entries(payload.characters).map(([key, record]) => ({ key, record }));
+    if (Array.isArray(payload.data)) return payload.data.map((record, i) => ({ key:record?.slug || record?.key || record?.name || String(i), record }));
+    if (payload.data && typeof payload.data === 'object') {
+      const data = payload.data.items || payload.data.list || payload.data.avatar || payload.data.characters || payload.data;
+      if (Array.isArray(data)) return data.map((record, i) => ({ key:record?.slug || record?.key || record?.name || String(i), record }));
+      if (data && typeof data === 'object' && (data.name || data.Name || data.vision || data.element)) return [{ key:data.slug || data.key || data.id || data.name, record:data }];
+      if (data && typeof data === 'object') return Object.entries(data).filter(([, value]) => value && typeof value === 'object').map(([key, record]) => ({ key, record }));
+    }
+    if (payload.result && typeof payload.result === 'object') return unwrapCatalogRecords(payload.result);
+    if (typeof payload.name === 'string' || typeof payload.vision === 'string' || typeof payload.element === 'string') {
+      return [{ key:payload.slug || payload.key || payload.id || payload.name, record:payload }];
+    }
+    return Object.entries(payload).filter(([, value]) => value && typeof value === 'object').map(([key, record]) => ({ key, record }));
+  }
+  function normalizeElement(value) {
+    let text = String(typeof value === 'object' ? (value.name || value.text || value.type || '') : (value || '')).trim();
+    text = text.replace(/^ELEMENT_/i, '').replace(/^VISION_/i, '');
+    const aliases = { Fire:'Pyro', Wind:'Anemo', Ice:'Cryo', Electric:'Electro', Water:'Hydro', Rock:'Geo', Grass:'Dendro', None:'Physical' };
+    const normalized = text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
+    return aliases[text] || aliases[normalized] || normalized;
+  }
+  function normalizeWeapon(value) {
+    const text = String(typeof value === 'object' ? (value.name || value.type || '') : (value || '')).trim();
+    const upper = text.toUpperCase();
+    if (upper.includes('SWORD') && !upper.includes('CLAYMORE')) return 'Sword';
+    if (upper.includes('BOW')) return 'Bow';
+    if (upper.includes('CLAYMORE')) return 'Claymore';
+    if (upper.includes('POLE')) return 'Polearm';
+    if (upper.includes('CATALYST')) return 'Catalyst';
+    return text;
+  }
+  function normalizeCatalogPayload(payload) {
+    const entries = unwrapCatalogRecords(payload);
+    const normalized = [];
+    const seen = new Set();
+    for (const entry of entries) {
+      const raw = entry.record?.data && typeof entry.record.data === 'object' ? entry.record.data : entry.record;
+      if (!raw || typeof raw !== 'object') continue;
+      const rawName = raw.name || raw.Name || raw.enName || raw.route || '';
+      const fallbackSlug = raw.slug || raw.key || raw.route || (typeof raw.id === 'string' ? raw.id : '') || rawName || entry.key;
+      const slug = catalogSlug(fallbackSlug);
+      const name = String(rawName || displayNameFromSlug(slug)).trim();
+      if (!name || !slug) continue;
+      const dedupeKey = catalogNameKey(name);
+      if (seen.has(dedupeKey)) continue;
+      seen.add(dedupeKey);
+      const element = normalizeElement(raw.elementText || raw.vision || raw.element || raw.visionType || raw.vision_type || raw.vision_key || raw.elementType || '');
+      const weapon = normalizeWeapon(raw.weaponText || raw.weapon || raw.weaponType || raw.weapon_type || '');
+      const nationRaw = raw.nation || raw.region || raw.native || '';
+      const nation = String(typeof nationRaw === 'object' ? (nationRaw.name || nationRaw.type || '') : nationRaw);
+      const rarityValue = Number(raw.rarity || raw.rank || raw.star || raw.stars || 0);
+      const description = String(raw.description || raw.desc || raw.introduction || raw.story?.description || '').trim();
+      const imageObject = raw.img || raw.images || raw.image || {};
+      const remoteImages = [];
+      if (typeof imageObject === 'string' && /^https?:\/\//i.test(imageObject)) remoteImages.push(imageObject);
+      else if (imageObject && typeof imageObject === 'object') {
+        ['portrait','icon','mihoyo_icon','hoyowiki_icon','hoyolab-avatar','card','icon-big','iconBig','sideIcon','side_icon'].forEach(key => {
+          const imageValue = imageObject[key];
+          if (typeof imageValue === 'string' && /^https?:\/\//i.test(imageValue)) remoteImages.push(imageValue);
+        });
+      }
+      // IconName is the front-facing head icon. SideIconName is a separate angled crop.
+      const rawIconValue = raw.IconName || raw.iconName || raw.icon_name || raw.frontIcon || raw.icon || raw.SideIconName || raw.sideIconName || raw.side_icon || '';
+      const rawIcon = String(rawIconValue || '').trim();
+      let icon = rawIcon;
+      if (/^https?:\/\//i.test(icon)) { remoteImages.unshift(icon); icon = ''; }
+      else icon = icon.replace(/^\/?ui\//i,'').replace(/\.(png|webp)$/i,'');
+      const frontIcon = icon ? frontFacingAssetName(icon) : '';
+      if (frontIcon) {
+        for (const source of ['https://enka.network/ui/','https://gi.yatta.moe/assets/UI/','https://api.ambr.top/assets/UI/']) {
+          remoteImages.unshift(`${source}${encodeURIComponent(frontIcon)}.png`);
+        }
+      }
+      const summarizeEntries = (items, limit=12) => Array.isArray(items) ? items.slice(0,limit).map(item => ({
+        name:String(item?.name || ''), unlock:String(item?.unlock || ''), description:String(item?.description || '')
+      })).filter(item => item.name || item.description) : [];
+      normalized.push({
+        id:slug, slug, name, element, weapon, nation, enkaId:Number(raw.id || raw.avatarId || raw.avatarID || raw.enkaId || (/^\d+$/.test(String(entry.key)) ? entry.key : 0)) || null,
+        rarity:Number.isFinite(rarityValue) && rarityValue > 0 ? rarityValue : null,
+        icon:frontIcon || icon, frontIcon, title:String(raw.title || ''), affiliation:String(raw.affiliation || ''), gender:String(raw.gender || ''),
+        constellation:String(raw.constellation || ''), birthday:Array.isArray(raw.birthday) ? raw.birthday.join('/') : String(raw.birthday || ''),
+        release:String(raw.release || raw.releasedAt || ''), description,
+        skills:summarizeEntries(raw.skillTalents || raw.skills, 8),
+        passives:summarizeEntries(raw.passiveTalents || raw.passives, 8),
+        constellations:summarizeEntries(raw.constellations, 6),
+        imageUrls:[...new Set(remoteImages)]
+      });
+    }
+    return normalized;
+  }
+  function mergeCatalogRecords(records) {
+    let added = 0;
+    let refreshed = 0;
+    for (const remote of records) {
+      const matchKeys = new Set([remote.id, remote.slug, remote.name, remote.slug.replace(/-/g, ' ')].map(catalogNameKey));
+      let existing = DATA.characters.find(character => {
+        const keys = [character.id, character.name, ...(character.aliases || [])].map(catalogNameKey);
+        return keys.some(key => matchKeys.has(key));
+      });
+      if (existing) {
+        existing.remoteSlug = remote.slug;
+        existing.imageUrls = remote.imageUrls?.length ? [...new Set([...remote.imageUrls, ...(existing.imageUrls || [])])] : existing.imageUrls;
+        if (remote.icon) existing.icon = remote.icon;
+        if (remote.frontIcon) existing.frontIcon = remote.frontIcon;
+        if (remote.enkaId) existing.enkaId = remote.enkaId;
+        if (remote.element) existing.element = remote.element;
+        if (remote.weapon) existing.weapon = remote.weapon;
+        if (remote.nation) { existing.nation = remote.nation; existing.region = remote.nation; }
+        if (remote.rarity) existing.rarity = remote.rarity;
+        if (remote.description) existing.description = remote.description;
+        ['title','affiliation','gender','constellation','birthday','release','skills','passives','constellations'].forEach(key => {
+          if (remote[key] && (!Array.isArray(remote[key]) || remote[key].length)) existing[key] = remote[key];
+        });
+        refreshed++;
+      } else {
+        const character = {
+          id:remote.id, name:remote.name, element:remote.element || 'Unknown',
+          role:'Unclassified', weapon:remote.weapon || 'Unknown', nation:remote.nation || '',
+          region:remote.nation || '', rarity:remote.rarity, description:remote.description,
+          title:remote.title, affiliation:remote.affiliation, gender:remote.gender,
+          constellation:remote.constellation, birthday:remote.birthday, release:remote.release,
+          skills:remote.skills, passives:remote.passives, constellations:remote.constellations,
+          icon:remote.icon || '', frontIcon:remote.frontIcon || remote.icon || '', enkaId:remote.enkaId || null,
+          remoteSlug:remote.slug, imageUrls:remote.imageUrls,
+          tags:[], preferred:[], aliases:[],
+          rotation:'New catalog entry: use your teammates’ support abilities first, then try this character’s Skill and Burst as appropriate. This is generic guidance, not a curated rotation.'
+        };
+        DATA.characters.push(character);
+        if (character.enkaId) DATA.profileAvatarIds[String(character.enkaId)] = character;
+        added++;
+      }
+      const finalCharacter = existing || DATA.characters[DATA.characters.length - 1];
+      if (finalCharacter?.enkaId) DATA.profileAvatarIds[String(finalCharacter.enkaId)] = finalCharacter;
+    }
+    DATA.characters.sort((a,b) => a.name.localeCompare(b.name));
+    return { added, refreshed, total:DATA.characters.length };
+  }
+  // Enka's current public game-data manifests contain the exact avatar IDs,
+  // official front-facing IconName values, and English name localizations.
+  // This replaces filename guessing for the large bundled roster.
+  const ENKA_AVATARS_URL = 'https://raw.githubusercontent.com/EnkaNetwork/API-docs/refs/heads/master/store/gi/avatars.json';
+  const ENKA_LOCS_URL = 'https://raw.githubusercontent.com/EnkaNetwork/API-docs/refs/heads/master/store/gi/locs.json';
+  const PORTRAIT_MANIFEST_CACHE_KEY = 'starglow:portrait-manifest:v5';
+  let portraitManifestPromise = null;
+
+  function getEnkaEnglishLocs(payload) {
+    if (!payload || typeof payload !== 'object') return {};
+    const root = payload.locs || payload.data || payload;
+    const languageKeys = ['en','EN','en-us','en-US','en_us','en_US','english','English','English(US)'];
+    for (const key of languageKeys) {
+      const candidate = root[key];
+      if (candidate && typeof candidate === 'object') return candidate;
+    }
+    // Some Enka mirrors wrap locale tables under a TextMap/localizations object.
+    for (const branch of [root.TextMap, root.textMap, root.localizations, root.locales, root.languages]) {
+      if (!branch || typeof branch !== 'object') continue;
+      for (const key of languageKeys) {
+        const candidate = branch[key];
+        if (candidate && typeof candidate === 'object') return candidate;
+      }
+    }
+    for (const value of Object.values(root)) {
+      if (!value || typeof value !== 'object') continue;
+      for (const key of languageKeys) {
+        const candidate = value[key];
+        if (candidate && typeof candidate === 'object') return candidate;
+      }
+    }
+    // Last-resort support for a flat hash-to-name English dictionary.
+    const numericEntries = Object.entries(root).filter(([key, value]) => /^\d+$/.test(key) && typeof value === 'string');
+    return numericEntries.length > 50 ? Object.fromEntries(numericEntries) : {};
+  }
+  function getEnkaAvatarEntries(payload) {
+    let root = payload?.avatars || payload?.data || payload;
+    if (root?.items && typeof root.items === 'object') root = root.items;
+    if (Array.isArray(root)) return root.map((record, index) => [String(record?.id || record?.Id || record?.avatarId || index), record]);
+    if (root && typeof root === 'object') return Object.entries(root);
+    return [];
+  }
+  function applyEnkaPortraitMappings(mappings) {
+    if (!Array.isArray(mappings) || !mappings.length) return 0;
+    const byId = new Map();
+    const byName = new Map();
+    for (const item of mappings) {
+      if (!item || !item.frontIcon) continue;
+      if (item.id) byId.set(String(item.id), item);
+      for (const name of [item.name, ...(Array.isArray(item.aliases) ? item.aliases : [])]) {
+        const key = catalogNameKey(name);
+        if (key && !byName.has(key)) byName.set(key, item);
+      }
+    }
+    let mapped = 0;
+    const EXTRA_ENKA_NAME_ALIASES = {
+      'Raiden Shogun':['Raiden','Ei','Shogun'], 'Tartaglia':['Childe'],
+      'Kaedehara Kazuha':['Kazuha'], 'Arataki Itto':['Itto'],
+      'Kamisato Ayaka':['Ayaka'], 'Kamisato Ayato':['Ayato'],
+      'Sangonomiya Kokomi':['Kokomi'], 'Yae Miko':['Yae','Miko'],
+      'Shikanoin Heizou':['Heizou'], 'Kuki Shinobu':['Shinobu'],
+      'Kujou Sara':['Sara'], 'Yumemizuki Mizuki':['Mizuki'],
+      'Alhaitham':['Al-Haitham'], 'Traveler':['Aether','Lumine']
+    };
+    for (const character of DATA.characters) {
+      const names = [
+        character.name, character.id, character.remoteSlug,
+        ...(character.aliases || []),
+        ...(ROSTER_NAME_ALIASES[character.name] || []),
+        ...(EXTRA_ENKA_NAME_ALIASES[character.name] || [])
+      ];
+      // Prefer the localized exact character name when available. A few older
+      // hand-entered roster IDs were approximate or copied from costume variants;
+      // name matching prevents one character from inheriting another character's icon.
+      let match = null;
+      for (const name of names) {
+        match = byName.get(catalogNameKey(name));
+        if (match) break;
+      }
+      if (!match && character.enkaId) match = byId.get(String(character.enkaId));
+      if (!match?.frontIcon) continue;
+      const front = frontFacingAssetName(match.frontIcon);
+      if (!front) continue;
+      character.frontIcon = front;
+      character.icon = front;
+      character.enkaId = character.enkaId || (match.id && /^\d+$/.test(String(match.id)) ? Number(match.id) : null);
+      const encoded = encodeURIComponent(front);
+      const exactFrontURLs = [
+        `https://enka.network/ui/${encoded}.png`,
+        `https://api.ambr.top/assets/UI/${encoded}.png`,
+        `https://gi.yatta.moe/assets/UI/${encoded}.png`
+      ];
+      // Keep exact official assets first. Legacy URL guesses remain only as last resorts.
+      character.imageUrls = [...new Set([...exactFrontURLs, ...(character.imageUrls || [])])];
+      if (character.enkaId) DATA.profileAvatarIds[String(character.enkaId)] = character;
+      mapped++;
+    }
+    return mapped;
+  }
+  function applyCachedEnkaPortraitMappings() {
+    try {
+      const cache = JSON.parse(localStorage.getItem(PORTRAIT_MANIFEST_CACHE_KEY) || 'null');
+      if (cache?.mappings) return applyEnkaPortraitMappings(cache.mappings);
+    } catch (error) {
+      console.info('Starglow could not read its saved portrait manifest:', error);
+    }
+    return 0;
+  }
+  async function enrichWithEnkaIconManifest(force=false) {
+    if (force) portraitManifestPromise = null;
+    if (portraitManifestPromise) return portraitManifestPromise;
+    portraitManifestPromise = (async () => {
+      try {
+        const [avatarPayload, locPayload] = await Promise.all([
+          fetchCatalogJSON(ENKA_AVATARS_URL + (force ? `?starglow=${Date.now()}` : ''), 16000),
+          fetchCatalogJSON(ENKA_LOCS_URL + (force ? `?starglow=${Date.now()}` : ''), 16000)
+        ]);
+        const englishLocs = getEnkaEnglishLocs(locPayload);
+        const mappings = [];
+        for (const [key, record] of getEnkaAvatarEntries(avatarPayload)) {
+          if (!record || typeof record !== 'object') continue;
+          const rawKey = String(record.Id || record.id || record.avatarId || key);
+          // Skip traveler element variants and non-numeric/testing entries; the bundled Traveler entry is handled separately.
+          if (rawKey.includes('-') || !/^\d+$/.test(rawKey)) continue;
+          const rawId = rawKey;
+          const hash = record.NameTextMapHash || record.nameTextMapHash || record.nameTextHash;
+          const localizedName = hash != null ? englishLocs[String(hash)] : '';
+          const name = String(record.name || record.Name || localizedName || '').trim();
+          // Enka's current manifest stores these as paths (for example
+          // /ui/UI_AvatarIcon_Side_Qin.png), not bare UI_AvatarIcon_* strings.
+          // Accept either form. Prefer the true front icon when supplied; otherwise
+          // convert the SideIconName path to its paired front-facing icon.
+          const isAvatarAssetPath = value => typeof value === 'string' && /UI_AvatarIcon_/i.test(value);
+          const iconValue = [
+            record.IconName, record.iconName, record.icon_name,
+            record.Images?.Icon, record.images?.icon, record.Icon, record.icon
+          ].find(isAvatarAssetPath);
+          const sideValue = [
+            record.SideIconName, record.sideIconName, record.side_icon,
+            record.Images?.SideIcon, record.images?.sideIcon, record.SideIcon
+          ].find(isAvatarAssetPath);
+          const frontIcon = frontFacingAssetName(iconValue || sideValue || '');
+          if (!frontIcon) continue;
+          mappings.push({ id:rawId, name, frontIcon });
+        }
+        const mapped = applyEnkaPortraitMappings(mappings);
+        if (mapped) {
+          try {
+            localStorage.setItem(PORTRAIT_MANIFEST_CACHE_KEY, JSON.stringify({ updatedAt:Date.now(), mappings }));
+          } catch (storageError) {
+            console.info('Starglow could not cache its portrait manifest:', storageError);
+          }
+        }
+        return mapped;
+      } catch (error) {
+        console.info('Starglow could not refresh the Enka portrait manifest; using cached and catalog portrait URLs.', error);
+        return 0;
+      } finally {
+        portraitManifestPromise = null;
+      }
+    })();
+    return portraitManifestPromise;
+  }
+  let lastPortraitAudit = null;
+  function loadImageCandidate(url, timeoutMs=3500) {
+    return new Promise(resolve => {
+      const image = new Image();
+      let settled = false;
+      const finish = ok => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        image.onload = null;
+        image.onerror = null;
+        resolve(ok ? url : '');
+      };
+      const timer = setTimeout(() => finish(false), timeoutMs);
+      image.onload = () => finish(image.naturalWidth > 0 && image.naturalHeight > 0);
+      image.onerror = () => finish(false);
+      image.referrerPolicy = 'no-referrer';
+      image.src = url;
+    });
+  }
+  async function auditAllPortraits() {
+    const button = $('#auditPortraitsButton');
+    if (button) { button.disabled = true; button.textContent = 'Checking…'; }
+    updateCatalogStatus('Refreshing official portrait metadata and checking character images…');
+    try {
+      await enrichWithEnkaIconManifest(true);
+      const chars = [...DATA.characters];
+      const mappedCount = chars.filter(character => Boolean(character.frontIcon)).length;
+      let checked = 0;
+      const failures = [];
+      let cursor = 0;
+      const worker = async () => {
+        while (cursor < chars.length) {
+          const index = cursor++;
+          const character = chars[index];
+          let found = '';
+          // Test a small, deterministic set of direct hosts first; proxy fallbacks remain for normal display.
+          const candidates = characterImageCandidates(character);
+          for (const candidate of candidates) {
+            found = await loadImageCandidate(candidate);
+            if (found) break;
+          }
+          if (found) {
+            const filename = (() => { try { return decodeURIComponent(new URL(found).pathname.split('/').pop() || ''); } catch { return ''; } })();
+            const token = filename.match(/^(UI_AvatarIcon_(?!Side_).+?)\.png$/i)?.[1];
+            if (token) { character.frontIcon = token; character.icon = token; }
+            character.imageUrls = [...new Set([found, ...(character.imageUrls || [])])];
+          } else {
+            failures.push(character.name);
+          }
+          checked++;
+          if (checked % 20 === 0) updateCatalogStatus(`Checking portraits… ${checked}/${chars.length}`);
+        }
+      };
+      await Promise.all(Array.from({length:Math.min(8, chars.length)}, () => worker()));
+      renderRoster();
+      lastPortraitAudit = { checked, failed:failures, updatedAt:Date.now() };
+      try { localStorage.setItem('starglow:portrait-audit:v1', JSON.stringify(lastPortraitAudit)); } catch {}
+      const message = failures.length
+        ? `Portrait check: ${checked - failures.length}/${checked} images loaded. ${failures.length} still failing after checking all known sources: ${failures.join(', ')}.`
+        : `Portrait check complete: all ${checked} character images loaded successfully.`;
+      updateCatalogStatus(`${message} Official front-icon mappings: ${mappedCount}/${chars.length}.`);
+      toast(failures.length ? `${failures.length} portraits still need attention` : 'All character portraits loaded');
+    } catch (error) {
+      updateCatalogStatus(`Portrait check failed: ${error?.message || error}. Check your internet connection and try again.`);
+    } finally {
+      if (button) { button.disabled = false; button.textContent = 'Audit portraits'; }
+    }
+  }
+
+  function updateCatalogStatus(message) {
+    const status = $('#catalogStatus');
+    if (status) status.textContent = message;
+  }
+  function readCatalogCache() {
+    try {
+      const cache = JSON.parse(localStorage.getItem(CATALOG_CACHE_KEY) || 'null');
+      if (cache && Array.isArray(cache.records)) {
+        const result = mergeCatalogRecords(cache.records);
+        const stamp = cache.updatedAt ? new Date(cache.updatedAt).toLocaleString() : 'an earlier session';
+        updateCatalogStatus(`Saved catalog loaded · ${result.total} characters · last updated ${stamp}.`);
+        return true;
+      }
+    } catch (error) {
+      console.warn('Starglow could not read its saved character catalog:', error);
+    }
+    return false;
+  }
+  async function fetchCatalogJSON(url, timeoutMs=22000) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const response = await fetch(url, { method:'GET', headers:{ 'Accept':'application/json' }, cache:'no-store', signal:controller.signal });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return await response.json();
+    } finally {
+      clearTimeout(timeout);
+    }
+  }
+  async function fetchCatalogRecords() {
+    const sourceResults = await Promise.allSettled(CATALOG_SOURCES.map(async source => {
+      const payload = await fetchCatalogJSON(source.url);
+      const records = normalizeCatalogPayload(payload).filter(record => !/\btraveler\b/i.test(record.name));
+      if (records.length >= 20) return { source:source.name, records };
+      throw new Error(`${source.name} returned only ${records.length} usable character records`);
+    }));
+    const combined = new Map();
+    const successfulSources = [];
+    for (const result of sourceResults) {
+      if (result.status !== 'fulfilled') continue;
+      successfulSources.push(`${result.value.source}: ${result.value.records.length}`);
+      for (const record of result.value.records) {
+        const key = catalogNameKey(record.name);
+        if (!key) continue;
+        const current = combined.get(key);
+        // Prefer the record that has a real image or more metadata.
+        const score = item => (item.imageUrls?.length ? 4 : 0) + (item.element ? 2 : 0) + (item.weapon ? 2 : 0) + (item.rarity ? 1 : 0) + (item.nation ? 1 : 0) + (item.description ? 1 : 0);
+        if (!current || score(record) > score(current)) combined.set(key, record);
+      }
+    }
+    const records = [...combined.values()];
+    if (records.length >= CATALOG_MIN_COMPLETE) {
+      records.sort((a,b) => a.name.localeCompare(b.name));
+      return { records, successfulSources };
+    }
+    const diagnostics = sourceResults.map((r,i) => r.status === 'fulfilled' ? '' : `${CATALOG_SOURCES[i].name}: ${r.reason?.message || 'unavailable'}`).filter(Boolean).join('; ');
+    throw new Error(`Only ${records.length} unique characters were received; Starglow requires at least ${CATALOG_MIN_COMPLETE} for a complete roster. ${diagnostics}`);
+  }
+  async function syncCharacterCatalog(force=false) {
+    if (catalogSyncPromise) return catalogSyncPromise;
+    const lastSuccess = Number(localStorage.getItem(CATALOG_CHECK_KEY) || 0);
+    const retryWindow = lastSuccess ? CATALOG_CHECK_INTERVAL : CATALOG_RETRY_INTERVAL;
+    const lastCheck = Number(sessionStorage.getItem('starglow:catalog:last-check-session') || 0);
+    if (!force && ((lastSuccess && Date.now() - lastSuccess < CATALOG_CHECK_INTERVAL) || (!lastSuccess && lastCheck && Date.now() - lastCheck < CATALOG_RETRY_INTERVAL))) return;
+    const button = $('#syncCatalogButton');
+    if (button) { button.disabled = true; button.textContent = 'Checking…'; }
+    updateCatalogStatus('Checking the live Genshin character catalog…');
+    sessionStorage.setItem('starglow:catalog:last-check-session', String(Date.now()));
+    catalogSyncPromise = (async () => {
+      try {
+        const catalog = await fetchCatalogRecords();
+        const records = catalog.records;
+        const result = mergeCatalogRecords(records);
+        const officialPortraits = await enrichWithEnkaIconManifest();
+        const updatedAt = Date.now();
+        try {
+          localStorage.setItem(CATALOG_CACHE_KEY, JSON.stringify({ updatedAt, records }));
+          localStorage.setItem(CATALOG_CHECK_KEY, String(updatedAt));
+        } catch (storageError) {
+          console.warn('Starglow could not cache the full character catalog:', storageError);
+        }
+        // New characters should be visible immediately so players can mark which ones they own.
+        if (result.added > 0) $('#showOwnedOnly').checked = false;
+        renderRoster();
+        const stamp = new Date(updatedAt).toLocaleString();
+        updateCatalogStatus(`Catalog sync complete · ${result.total} characters · ${result.added} new · ${officialPortraits} official portrait mappings refreshed · ${stamp}. Sources: ${catalog.successfulSources.join(' | ')}`);
+        if (result.added > 0) toast(`${result.added} new character${result.added === 1 ? '' : 's'} added to the catalog`);
+        return result;
+      } catch (error) {
+        const cached = (() => { try { return JSON.parse(localStorage.getItem(CATALOG_CACHE_KEY) || 'null'); } catch { return null; } })();
+        updateCatalogStatus(cached?.records?.length ? `Online refresh failed; keeping your saved roster of ${DATA.characters.length} characters. Starglow will retry soon. ${error.message || ''}` : `Offline roster · ${DATA.characters.length} characters loaded. Connect to the internet to refresh character details and portraits. ${error.message || ''}`);
+        console.warn('Starglow character catalog sync failed:', error);
+        return null;
+      } finally {
+        if (button) { button.disabled = false; button.textContent = 'Check updates'; }
+        catalogSyncPromise = null;
+      }
+    })();
+    return catalogSyncPromise;
+  }
+  function startCatalogAutoChecks() {
+    const lastAttempt = Number(localStorage.getItem(CATALOG_CHECK_KEY) || 0);
+    if (!lastAttempt || Date.now() - lastAttempt >= CATALOG_CHECK_INTERVAL) syncCharacterCatalog(false);
+    if (catalogInterval) clearInterval(catalogInterval);
+    catalogInterval = setInterval(() => {
+      if (!document.hidden) syncCharacterCatalog(false);
+    }, CATALOG_RETRY_INTERVAL);
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) syncCharacterCatalog(false);
+    });
+  }
+
+  function renderTeam(result) {
+    if (!result || result.error) return;
+    const slots = result.lineup.map((character, index) => `
+      <div class="team-member">
+        <span class="slot-number">0${index+1}</span>${characterArt(character, 'member-art')}
+        <strong>${escapeHTML(character.name)}</strong><small class="member-element">${character.element} · ${character.role}</small>
+      </div>`).join('');
+    $('#teamSlots').innerHTML = slots;
+    $('#teamExplanation').textContent = result.explanation;
+    $('#resultStatus').textContent = 'TEAM BUILT';
+    $('#rotationList').innerHTML = result.rotation.map((character, index) => `
+      <li><div><strong>${escapeHTML(character.name)}</strong> — ${escapeHTML(character.rotation)}</div></li>`).join('');
+  }
+  function buildTeam() {
+    const mainId = $('#mainCharacter').value;
+    const result = ENGINE.buildTeam(mainId, state.owned, DATA.characters);
+    const feedback = $('#teamFeedback');
+    if (result.error) {
+      feedback.textContent = result.error; feedback.classList.add('error');
+      return;
+    }
+    feedback.textContent = 'Lineup generated from your current collection. Adjust ownership to explore other options.';
+    feedback.classList.remove('error');
+    currentTeam = result; state.lastTeam = { mainId, teammateIds:result.teammates.map(c => c.id) };
+    state.gems += 5; saveState(); renderWallet(); renderTeam(result);
+    toast('Team built · +5 Stargems');
+  }
+
+  function formatFileNames(files) {
+    if (!files.length) return 'No screenshots selected';
+    const names = files.map(f => f.name);
+    return names.length > 2 ? `${names.slice(0,2).join(', ')} +${names.length-2} more` : names.join(', ');
+  }
+
+  // Screenshot scanning is image-to-image matching. It never runs OCR and never
+  // reads the labels printed below the portraits. The v7 matcher combines several
+  // crops, perceptual hashes, edge structure and colour fingerprints.
+  const PORTRAIT_HASH_CACHE_KEY = 'starglow:portrait-image-signatures:multi-v7';
+  let portraitPreviewImage = null;
+  let portraitPreviewScale = 1;
+  let portraitCropRect = null;
+  let portraitCropWasManuallySet = false;
+  let portraitDragStart = null;
+  let portraitDragCurrent = null;
+  const HASH_SIZE = 32;
+  const HASH_LOW = 8;
+  const HASH_COS = Array.from({length:HASH_LOW}, (_,u) => Float32Array.from({length:HASH_SIZE}, (_,x) => Math.cos(((2*x+1)*u*Math.PI)/(2*HASH_SIZE))));
+  const PORTRAIT_VIEWS = [
+    {name:'face',x:.18,y:.16,w:.64,h:.64},
+    {name:'head',x:.10,y:.08,w:.80,h:.80},
+    {name:'portrait',x:.04,y:.03,w:.92,h:.92}
+  ];
+
+  function resolvePortraitLayouts(width,height,crop,mode='single',manualCrop=false) {
+    const columns=Math.max(2,Number($('#portraitColumns')?.value||3));
+    const rows=Math.max(2,Number($('#portraitRows')?.value||4));
+    const ratio=crop.w/Math.max(1,crop.h);
+    // Layout is always chosen by the user; no automatic panel detection.
+    const split=mode==='split';
+    if(split) {
+      const y=manualCrop ? crop.y+crop.h*.012 : crop.y+crop.h*.122;
+      const h=crop.h*(manualCrop?.975:.887);
+      return [
+        {kind:'split',name:'left panel',columns,rows,rect:{x:crop.x+crop.w*.009,y,w:crop.w*.494,h}},
+        {kind:'split',name:'right panel',columns,rows,rect:{x:crop.x+crop.w*.517,y,w:crop.w*.492,h}}
+      ];
+    }
+    return [{kind:'single',name:'grid',columns,rows,rect:{...crop}}];
+  }
+  function drawPortraitPreview() {
+    const canvas = $('#portraitPreviewCanvas');
+    if (!canvas || !portraitPreviewImage) return;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.drawImage(portraitPreviewImage,0,0,canvas.width,canvas.height);
+    const crop = portraitDragCurrent || portraitCropRect || {x:0,y:0,w:canvas.width,h:canvas.height};
+    ctx.save();
+    ctx.beginPath(); ctx.rect(0,0,canvas.width,canvas.height); ctx.rect(crop.x,crop.y,crop.w,crop.h);
+    ctx.fillStyle = 'rgba(4,7,12,.48)'; ctx.fill('evenodd');
+    ctx.strokeStyle = 'rgba(255,255,255,.95)'; ctx.lineWidth = Math.max(2,canvas.width/500); ctx.strokeRect(crop.x,crop.y,crop.w,crop.h);
+    const mode=$('#portraitLayout')?.value||'single';
+    const layouts=resolvePortraitLayouts(canvas.width,canvas.height,crop,mode,portraitCropWasManuallySet);
+    ctx.strokeStyle = 'rgba(255,255,255,.82)'; ctx.lineWidth = Math.max(1,canvas.width/1000);
+    for(const layout of layouts) {
+      const rect=layout.rect, cols=layout.columns, rows=layout.rows;
+      ctx.strokeRect(rect.x,rect.y,rect.w,rect.h);
+      for(let c=1;c<cols;c++) { const x=rect.x+rect.w*c/cols; ctx.beginPath(); ctx.moveTo(x,rect.y); ctx.lineTo(x,rect.y+rect.h); ctx.stroke(); }
+      for(let r=1;r<rows;r++) { const y=rect.y+rect.h*r/rows; ctx.beginPath(); ctx.moveTo(rect.x,y); ctx.lineTo(rect.x+rect.w,y); ctx.stroke(); }
+    }
+    ctx.restore();
+    const status=$('#portraitLayoutStatus');
+    if(status) status.textContent=layouts.length===2
+      ? `Manual layout: two side-by-side grids · ${layouts[0].columns} columns × ${layouts[0].rows} rows each · ${layouts.reduce((n,l)=>n+l.columns*l.rows,0)} portrait tiles.`
+      : `Manual layout: one grid · ${layouts[0].columns} columns × ${layouts[0].rows} rows. Set the columns and rows to match your screenshot.`;
+  }
+  async function showPortraitPreview(file) {
+    const panel = $('#portraitScanPanel');
+    const canvas = $('#portraitPreviewCanvas');
+    if (!file || !panel || !canvas) return;
+    panel.hidden = false;
+    const objectUrl = URL.createObjectURL(file);
+    try {
+      const img = new Image();
+      await new Promise((resolve,reject) => { img.onload=resolve; img.onerror=()=>reject(new Error('Could not open the screenshot preview.')); img.src=objectUrl; });
+      portraitPreviewImage = img;
+      portraitCropWasManuallySet = false;
+      portraitPreviewScale = Math.min(900/img.naturalWidth, 480/img.naturalHeight, 1);
+      canvas.width = Math.max(1,Math.round(img.naturalWidth*portraitPreviewScale));
+      canvas.height = Math.max(1,Math.round(img.naturalHeight*portraitPreviewScale));
+      portraitCropRect = {x:0,y:0,w:canvas.width,h:canvas.height};
+      drawPortraitPreview();
+    } finally { URL.revokeObjectURL(objectUrl); }
+  }
+  function portraitCanvasPoint(event) {
+    const canvas = $('#portraitPreviewCanvas');
+    const box = canvas.getBoundingClientRect();
+    return {
+      x:Math.max(0,Math.min(canvas.width,(event.clientX-box.left)*canvas.width/box.width)),
+      y:Math.max(0,Math.min(canvas.height,(event.clientY-box.top)*canvas.height/box.height))
+    };
+  }
+  function loadLocalImage(file) {
+    return new Promise((resolve,reject) => {
+      const url=URL.createObjectURL(file); const img=new Image();
+      img.onload=()=>{URL.revokeObjectURL(url);resolve(img)};
+      img.onerror=()=>{URL.revokeObjectURL(url);reject(new Error(`Could not read ${file.name}.`))};
+      img.src=url;
+    });
+  }
+  function squareSourceRegion(source,region) {
+    let sx=region?.x ?? 0, sy=region?.y ?? 0;
+    let sw=region?.w ?? (source.naturalWidth||source.width);
+    let sh=region?.h ?? (source.naturalHeight||source.height);
+    const maxW=source.naturalWidth||source.width, maxH=source.naturalHeight||source.height;
+    sx=Math.max(0,Math.min(maxW-1,sx)); sy=Math.max(0,Math.min(maxH-1,sy));
+    sw=Math.max(1,Math.min(maxW-sx,sw)); sh=Math.max(1,Math.min(maxH-sy,sh));
+    // Keep the crop centered. A square canvas makes comparisons insensitive to
+    // tiny differences in card aspect ratio and browser image scaling.
+    if(sw>sh) { sx+=(sw-sh)/2; sw=sh; }
+    else if(sh>sw) { sy+=(sh-sw)*.28; sh=sw; }
+    return {x:sx,y:sy,w:sw,h:sh};
+  }
+  function imageToPortraitSignature(source,region=null) {
+    const canvas=document.createElement('canvas'); canvas.width=HASH_SIZE; canvas.height=HASH_SIZE;
+    const ctx=canvas.getContext('2d',{willReadFrequently:true});
+    ctx.imageSmoothingEnabled=true; ctx.imageSmoothingQuality='high';
+    ctx.fillStyle='#777'; ctx.fillRect(0,0,HASH_SIZE,HASH_SIZE);
+    const crop=squareSourceRegion(source,region);
+    ctx.drawImage(source,crop.x,crop.y,crop.w,crop.h,0,0,HASH_SIZE,HASH_SIZE);
+    const pixels=ctx.getImageData(0,0,HASH_SIZE,HASH_SIZE).data;
+    const gray=new Float32Array(HASH_SIZE*HASH_SIZE);
+    const hist=new Array(24).fill(0);
+    for(let i=0,p=0;i<pixels.length;i+=4,p++) {
+      gray[p]=.299*pixels[i]+.587*pixels[i+1]+.114*pixels[i+2];
+      hist[pixels[i]>>5]++;
+      hist[8+(pixels[i+1]>>5)]++;
+      hist[16+(pixels[i+2]>>5)]++;
+    }
+    const coeffs=[];
+    for(let v=0;v<HASH_LOW;v++) for(let u=0;u<HASH_LOW;u++) {
+      let sum=0;
+      for(let y=0;y<HASH_SIZE;y++) {
+        const cy=HASH_COS[v][y], row=y*HASH_SIZE;
+        for(let x=0;x<HASH_SIZE;x++) sum+=gray[row+x]*HASH_COS[u][x]*cy;
+      }
+      coeffs.push(sum);
+    }
+    const sorted=coeffs.slice(1).sort((a,b)=>a-b);
+    const median=sorted[Math.floor(sorted.length/2)];
+    let pHash=0n;
+    for(let i=1;i<coeffs.length;i++) if(coeffs[i]>=median) pHash|=(1n<<BigInt(i));
+
+    // Difference hash captures local line direction and is less sensitive to
+    // background colour than a single whole-image perceptual hash.
+    let dHash=0n, bit=0n;
+    for(let y=0;y<8;y++) for(let x=0;x<8;x++) {
+      const row=(y*4+2)*HASH_SIZE;
+      const left=gray[row+x*4+1], right=gray[row+(x+1)*4+1];
+      if(left>right) dHash|=(1n<<bit);
+      bit++;
+    }
+    const channelPixels=HASH_SIZE*HASH_SIZE;
+    for(let channel=0;channel<3;channel++) {
+      const base=channel*8;
+      for(let bin=0;bin<8;bin++) hist[base+bin]/=channelPixels;
+    }
+    let edgeTotal=0,edgeCount=0;
+    for(let y=0;y<HASH_SIZE;y++) for(let x=0;x<HASH_SIZE;x++) {
+      const index=y*HASH_SIZE+x;
+      if(x+1<HASH_SIZE) { edgeTotal+=Math.abs(gray[index]-gray[index+1]); edgeCount++; }
+      if(y+1<HASH_SIZE) { edgeTotal+=Math.abs(gray[index]-gray[index+HASH_SIZE]); edgeCount++; }
+    }
+    const edge=edgeTotal/Math.max(1,edgeCount)/255;
+    return {p:pHash.toString(16).padStart(16,'0'),d:dHash.toString(16).padStart(16,'0'),h:hist,e:edge};
+  }
+  function imageToPortraitSignatures(source,baseRegion=null) {
+    const base=baseRegion || {x:0,y:0,w:source.naturalWidth||source.width,h:source.naturalHeight||source.height};
+    return PORTRAIT_VIEWS.map(view=>imageToPortraitSignature(source,{
+      x:base.x+base.w*view.x,y:base.y+base.h*view.y,w:base.w*view.w,h:base.h*view.h
+    }));
+  }
+  function hashSimilarity(a,b) {
+    let bits=BigInt(`0x${a}`)^BigInt(`0x${b}`), count=0;
+    while(bits) { bits&=bits-1n; count++; }
+    return 1-count/64;
+  }
+  function histogramSimilarity(a,b) {
+    if(!Array.isArray(a)||!Array.isArray(b)||a.length!==24||b.length!==24) return .5;
+    let total=0;
+    for(let i=0;i<24;i++) total+=Math.min(a[i],b[i]);
+    return total/3;
+  }
+  function signatureSimilarity(a,b) {
+    const perceptual=hashSimilarity(a.p,b.p);
+    const difference=hashSimilarity(a.d,b.d);
+    const colour=histogramSimilarity(a.h,b.h);
+    return perceptual*.66+difference*.22+colour*.12;
+  }
+  function signatureSetSimilarity(a,b) {
+    const scores=a.map((signature,index)=>signatureSimilarity(signature,b[index]||b[b.length-1]));
+    scores.sort((x,y)=>y-x);
+    return scores.length>1 ? scores[0]*.72+scores[1]*.28 : (scores[0]||0);
+  }
+  function readPortraitHashCache() {
+    try { const value=JSON.parse(localStorage.getItem(PORTRAIT_HASH_CACHE_KEY)||'{}'); return value && typeof value==='object' ? value : {}; }
+    catch { return {}; }
+  }
+  function writePortraitHashCache(cache) {
+    try { localStorage.setItem(PORTRAIT_HASH_CACHE_KEY,JSON.stringify(cache)); }
+    catch(error) { console.warn('Starglow could not save portrait matching cache:',error); }
+  }
+  function loadRemoteImage(url,timeoutMs=7000) {
+    return new Promise((resolve,reject) => {
+      const img=new Image(); let finished=false;
+      const timer=setTimeout(()=>{if(!finished){finished=true;img.src='';reject(new Error('Image request timed out'))}},timeoutMs);
+      img.crossOrigin='anonymous'; img.onload=()=>{if(finished)return;finished=true;clearTimeout(timer);resolve(img)};
+      img.onerror=()=>{if(finished)return;finished=true;clearTimeout(timer);reject(new Error('Portrait image unavailable'))};
+      img.src=url;
+    });
+  }
+  async function portraitReferenceHash(character,cache) {
+    const urls=characterImageCandidates(character);
+    const cached=cache[character.id];
+    if(cached?.version===7 && Array.isArray(cached.templates) && cached.templates.length && cached.templates.every(item=>Array.isArray(item.signatures)&&item.signatures.length===PORTRAIT_VIEWS.length)) return cached;
+    const directUrls=urls.slice(0,3);
+    const proxyUrls=directUrls.slice(0,2).map(url=>`https://wsrv.nl/?url=${encodeURIComponent(url)}`);
+    const attempts=[...directUrls,...proxyUrls];
+    const templates=[];
+    for(const url of attempts) {
+      try {
+        const img=await loadRemoteImage(url);
+        const signatures=imageToPortraitSignatures(img);
+        // Multiple image hosts often mirror the exact same asset. Keep at most
+        // two visually distinct templates so extra downloads stay lightweight.
+        const duplicate=templates.some(item=>signatureSetSimilarity(item.signatures,signatures)>.985);
+        if(!duplicate) templates.push({url,signatures});
+        if(templates.length>=2) break;
+      } catch(error) { /* try the next official or proxy source */ }
+    }
+    if(!templates.length) return null;
+    const record={version:7,templates}; cache[character.id]=record; return record;
+  }
+  async function buildPortraitReferenceSet(status,bar) {
+    const cache=readPortraitHashCache();
+    const chars=DATA.characters.slice();
+    let cursor=0,ready=0;
+    const refs=[];
+    const worker=async()=>{
+      while(cursor<chars.length) {
+        const character=chars[cursor++];
+        const record=await portraitReferenceHash(character,cache);
+        if(record) refs.push({id:character.id,name:character.name,templates:record.templates});
+        ready++;
+        if(ready%4===0 || ready===chars.length) {
+          status.textContent=`Preparing visual portrait references · ${ready}/${chars.length}`;
+          bar.style.width=`${Math.round(ready/chars.length*48)}%`;
+        }
+      }
+    };
+    await Promise.all(Array.from({length:4},worker));
+    writePortraitHashCache(cache);
+    if(refs.length<20) throw new Error(`Only ${refs.length} character portrait references could be read. Check the image connection and try again.`);
+    return refs;
+  }
+  function screenshotTileSignatureVariants(image,layout,col,row) {
+    const {rect,columns,rows}=layout;
+    const cellW=rect.w/columns,cellH=rect.h/rows;
+    const cellX=rect.x+col*cellW,cellY=rect.y+row*cellH;
+    // Variant A follows the visible card bounds. Variant B trims more of the
+    // border/element badge and compensates for a few pixels of screenshot drift.
+    const regions=[
+      {x:cellX+cellW*.012,y:cellY+cellH*.018,w:cellW*.90,h:cellH*.72},
+      {x:cellX+cellW*.055,y:cellY+cellH*.045,w:cellW*.82,h:cellH*.68}
+    ];
+    return regions.map(region=>imageToPortraitSignatures(image,region));
+  }
+  function scoreTileAgainstReference(tileVariants,reference) {
+    let best=0;
+    for(const tileSet of tileVariants) for(const template of reference.templates) {
+      const score=signatureSetSimilarity(tileSet,template.signatures);
+      if(score>best) best=score;
+    }
+    return best;
+  }
+  async function scanScreenshots() {
+    if (!selectedFiles.length || !portraitPreviewImage || !portraitCropRect) return;
+    const button=$('#scanButton'), progress=$('#scanProgress'), bar=$('#scanProgressBar'), status=$('#scanStatus');
+    const resultsBox=$('#portraitScanResults');
+    button.disabled=true; progress.hidden=false; resultsBox.hidden=true; resultsBox.innerHTML=''; bar.style.width='2%';
+    try {
+      status.textContent='Preparing multi-region portrait references (first scan may take longer)…';
+      const references=await buildPortraitReferenceSet(status,bar);
+      const previewCanvas=$('#portraitPreviewCanvas');
+      const normalizedCrop={x:portraitCropRect.x/previewCanvas.width,y:portraitCropRect.y/previewCanvas.height,w:portraitCropRect.w/previewCanvas.width,h:portraitCropRect.h/previewCanvas.height};
+      const layoutMode=$('#portraitLayout')?.value||'single';
+      const reviewByTile=new Map();
+      let scannedTiles=0,totalTiles=0,nonEmptyTiles=0;
+      const jobs=[];
+      for(let fileIndex=0;fileIndex<selectedFiles.length;fileIndex++) {
+        const image=fileIndex===0 ? portraitPreviewImage : await loadLocalImage(selectedFiles[fileIndex]);
+        const imageW=image.naturalWidth||image.width, imageH=image.naturalHeight||image.height;
+        const crop={x:normalizedCrop.x*imageW,y:normalizedCrop.y*imageH,w:normalizedCrop.w*imageW,h:normalizedCrop.h*imageH};
+        const layouts=resolvePortraitLayouts(imageW,imageH,crop,layoutMode,portraitCropWasManuallySet);
+        for(const layout of layouts) jobs.push({image,layout,fileIndex});
+      }
+      totalTiles=jobs.reduce((sum,job)=>sum+job.layout.columns*job.layout.rows,0);
+      for(const job of jobs) {
+        const {image,layout,fileIndex}=job;
+        status.textContent=layout.kind==='split'
+          ? `Scanning ${layout.name} · screenshot ${fileIndex+1}/${selectedFiles.length}`
+          : `Scanning character grid · screenshot ${fileIndex+1}/${selectedFiles.length}`;
+        for(let row=0;row<layout.rows;row++) for(let col=0;col<layout.columns;col++) {
+          scannedTiles++;
+          let tileVariants;
+          try { tileVariants=screenshotTileSignatureVariants(image,layout,col,row); }
+          catch { continue; }
+          const detail=Math.max(...tileVariants.flatMap(set=>set.map(signature=>signature.e)));
+          // The final slot of a partially-filled grid is just the page background.
+          if(detail<.018) continue;
+          nonEmptyTiles++;
+          const ranked=references.map(reference=>({
+            id:reference.id,name:reference.name,
+            score:scoreTileAgainstReference(tileVariants,reference)
+          })).sort((a,b)=>b.score-a.score);
+          if(!ranked.length) continue;
+          const location=`${layout.name}, row ${row+1}, column ${col+1}`;
+          // Every non-empty tile goes to manual review. The matcher only ranks
+          // candidates; it never declares a character or changes ownership.
+          const tileKey=`${fileIndex}:${layout.name}:${row}:${col}`;
+          reviewByTile.set(tileKey,{location,candidates:ranked.slice(0,10)});
+          if(scannedTiles%3===0 || scannedTiles===totalTiles) {
+            bar.style.width=`${Math.min(98,48+Math.round(scannedTiles/Math.max(1,totalTiles)*50))}%`;
+            status.textContent=`Comparing visual portrait features · ${scannedTiles}/${totalTiles}`;
+            await new Promise(resolve=>requestAnimationFrame(resolve));
+          }
+        }
+      }
+      const possible=[...reviewByTile.values()];
+      bar.style.width='100%';
+      status.textContent=`Manual review ready · ${possible.length} portrait tile(s) · ${nonEmptyTiles} non-empty tiles found. Nothing has been added yet.`;
+      if(possible.length) {
+        const reviewHtml=`<div class="portrait-review-group"><strong>Choose each character manually</strong><small>Each tile has up to 10 photo-based suggestions, ranked from closest visual match to least. Check the portrait preview before adding it. No character is selected automatically.</small>${possible.map((item,index)=>{
+          const first=item.candidates[0]; const firstCharacter=getCharacter(first?.id); const firstImage=firstCharacter?imgURL(firstCharacter):'';
+          return `<div class="portrait-review-row"><span><b>${escapeHTML(item.location)}</b><small>Top 10 visual candidates · best match first</small></span><div class="portrait-review-options"><details class="portrait-choice-picker" data-scan-picker="${index}"><summary><img data-scan-summary-image="${index}" src="${escapeHTML(firstImage)}" alt=""><span data-scan-summary-name="${index}">${escapeHTML(first?.name||'Choose a character')}</span><span aria-hidden="true">▾</span></summary><div class="portrait-choice-list" role="listbox" aria-label="Top character photo matches">${item.candidates.map((candidate,rank)=>{const character=getCharacter(candidate.id);const image=character?imgURL(character):'';return `<button type="button" class="portrait-choice-option" role="option" aria-selected="${rank===0?'true':'false'}" data-scan-candidate="${escapeHTML(candidate.id)}"><img src="${escapeHTML(image)}" alt="${escapeHTML(candidate.name)} portrait" loading="lazy"><span>${rank+1}. ${escapeHTML(candidate.name)}<small>${Math.round(candidate.score*100)}% visual match</small></span></button>`;}).join('')}</div><select data-scan-choice="${index}" aria-label="Choose a character match for ${escapeHTML(item.location)}">${item.candidates.map((candidate,rank)=>`<option value="${escapeHTML(candidate.id)}" ${rank===0?'selected':''}>${escapeHTML(candidate.name)}</option>`).join('')}</select></details><button type="button" class="button button-outline" data-scan-add> Add </button></div></div>`;
+        }).join('')}</div>`;
+        resultsBox.innerHTML=reviewHtml;
+        resultsBox.hidden=false;
+        resultsBox.querySelectorAll('[data-scan-picker]').forEach(picker=>picker.querySelectorAll('[data-scan-candidate]').forEach(option=>option.addEventListener('click',()=>{
+          const select=picker.querySelector('[data-scan-choice]'); const character=getCharacter(option.dataset.scanCandidate);
+          if(!select||!character)return;
+          select.value=character.id;
+          const summaryImage=picker.querySelector('[data-scan-summary-image]');
+          const summaryName=picker.querySelector('[data-scan-summary-name]');
+          if(summaryImage){summaryImage.src=imgURL(character);summaryImage.alt=`${character.name} portrait`;}
+          if(summaryName)summaryName.textContent=character.name;
+          picker.querySelectorAll('[data-scan-candidate]').forEach(button=>button.setAttribute('aria-selected',String(button===option)));
+          picker.open=false;
+        })));
+        resultsBox.querySelectorAll('[data-scan-add]').forEach(addButton=>addButton.addEventListener('click',()=>{
+          const row=addButton.closest('.portrait-review-row');
+          const id=row?.querySelector('[data-scan-choice]')?.value;
+          const character=getCharacter(id);
+          if(!character)return;
+          setOwned(id,true);
+          addButton.disabled=true;
+          addButton.textContent='Added';
+          toast(`${character.name} added to your roster`);
+        }));
+      } else {
+        resultsBox.innerHTML='<div class="rotation-empty">No portrait tiles were found. Adjust the crop, rows, or columns and try again.</div>';
+        resultsBox.hidden=false;
+      }
+      toast(`${possible.length} portrait tile(s) ready for manual review`);
+    } catch(error) {
+      status.textContent=error.message||'Visual portrait scan failed.';
+      toast('Portrait scan failed. Your roster was not changed.');
+    } finally { button.disabled=false; }
+  }
+
+  function renderProfile(profile) {
+    const info = profile?.playerInfo || {};
+    const name = info.nickname || 'Traveler';
+    const uid = profile?.uid || state.profile?.uid || '';
+    const signature = info.signature || 'No public signature set.';
+    const pictureId = info.profilePicture?.avatarId ? String(info.profilePicture.avatarId) : '';
+    const character = DATA.profileAvatarIds[pictureId];
+    $('#profileName').textContent = name;
+    $('#profileUid').textContent = uid ? `UID ${uid}` : 'UID NOT CONNECTED';
+    $('#profileSignature').textContent = `“${signature}”`;
+    $('#profilePicture').innerHTML = character ? characterArt(character, 'profile-avatar-art') : '<span>✧</span>';
+    $('#profileFootnote').textContent = character ? `Profile picture character: ${character.name}. Details shown are from the public Enka response.` : (pictureId ? `Enka returned profile picture character ID ${pictureId}. This character is not mapped in the currently loaded catalog yet.` : 'Enka did not return a profile-picture character for this account.');
+    $('#profileCard').dataset.profileTheme = state.equipped || 'starlit';
+  }
+  async function fetchEnka(uid) {
+    const cacheKey = `starglow:enka:${uid}`;
+    try {
+      const cached = JSON.parse(localStorage.getItem(cacheKey) || 'null');
+      if (cached && cached.expiresAt > Date.now() && cached.data) return cached.data;
+    } catch { /* ignore bad cache */ }
+    const response = await fetch(`https://enka.network/api/uid/${encodeURIComponent(uid)}/?info`, { headers:{ 'Accept':'application/json' } });
+    let data = {};
+    try { data = await response.json(); } catch { /* API may return a non-JSON error */ }
+    if (!response.ok) {
+      const messages = {
+        400:'That UID format was rejected by Enka.', 404:'Player not found or their public profile is unavailable.',
+        424:'Enka reports game maintenance. Try again later.', 429:'Enka or the game servers are rate-limiting requests. Please wait before retrying.',
+        500:'Enka could not retrieve the game profile.', 503:'Enka is temporarily unavailable.', 504:'The upstream game server timed out.'
+      };
+      throw new Error(messages[response.status] || data.message || `Enka request failed (${response.status}).`);
+    }
+    if (!data.playerInfo) throw new Error('Enka did not return public player information for this UID.');
+    // Enka's ttl tells clients when the next upstream showcase refresh may occur.
+    const ttlSeconds = Math.max(60, Number(data.ttl) || 300);
+    try { localStorage.setItem(cacheKey, JSON.stringify({ data, expiresAt:Date.now()+ttlSeconds*1000 })); } catch { /* storage may be full */ }
+    return data;
+  }
+  async function handleEnkaSubmit(event) {
+    event.preventDefault();
+    const uid = $('#uidInput').value.trim();
+    const message = $('#connectionMessage'); const button = $('#fetchProfileButton');
+    if (!/^\d{8,10}$/.test(uid)) {
+      message.textContent = 'Enter a valid-looking Genshin UID (8–10 digits).'; message.classList.add('error'); return;
+    }
+    button.disabled = true; button.textContent = 'Connecting…'; message.classList.remove('error');
+    message.textContent = 'Contacting Enka.Network…';
+    try {
+      const data = await fetchEnka(uid);
+      state.profile = { uid, data }; saveState(); renderProfile({ ...data, uid });
+      message.textContent = 'Profile connected. Data reflects the public profile returned by Enka.Network.';
+      toast('Public profile connected');
+    } catch (error) {
+      message.textContent = `${error.message} If this is a browser CORS restriction, use a small server-side proxy in a production build.`;
+      message.classList.add('error');
+    } finally { button.disabled = false; button.textContent = 'Connect'; }
+  }
+
+  function applyProfileTheme() {
+    const theme = THEMES.find(t => t.id === state.equipped) || THEMES[0];
+    $('#profileCard').dataset.profileTheme = theme.id;
+    $('#profileThemeName').textContent = theme.name;
+  }
+  function renderShop() {
+    $('#themeShopGrid').innerHTML = THEMES.map(theme => {
+      const owned = state.purchased.includes(theme.id);
+      const equipped = state.equipped === theme.id;
+      const actionLabel = equipped ? 'Equipped' : owned ? 'Equip' : 'Unlock';
+      const actionClass = equipped ? 'equipped' : owned ? 'owned-theme' : '';
+      return `<article class="theme-card">
+        <div class="theme-preview" style="--theme-bg:${theme.themeBg};--theme-glow:${theme.glow}"><div class="preview-orbit">✧</div></div>
+        <div class="theme-info"><h3>${theme.name}</h3><p>${theme.description}</p><div class="theme-buy-row"><span class="theme-price">${theme.price ? `✧ ${theme.price}` : 'FREE'}</span><button class="button button-soft ${actionClass}" type="button" data-theme-action="${theme.id}" ${equipped?'disabled':''}>${actionLabel}</button></div></div>
+      </article>`;
+    }).join('');
+    applyProfileTheme();
+  }
+  function handleThemeAction(id) {
+    const theme = THEMES.find(t => t.id === id); if (!theme) return;
+    const owned = state.purchased.includes(id);
+    if (!owned) {
+      if (state.gems < theme.price) { toast('Not enough Stargems for this theme'); return; }
+      state.gems -= theme.price; state.purchased.push(id); toast(`${theme.name} unlocked`);
+    }
+    state.equipped = id; saveState(); renderShop(); renderWallet();
+  }
+  function localDateKey() {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+  }
+  const BANNER_SCHEDULE = {
+    phaseOne: {
+      version:'Version 7.2 · Phase 1',
+      names:['Mitya','Furina'],
+      fiveStars:['Mitya','Furina'],
+      fourStars:['Valeriy','Charlotte','Rosaria'],
+      weapons:['Starsealed Edict','Splendor of Tranquil Waters'],
+      starts:'2026-11-04T11:00',
+      ends:'2026-11-24T18:00',
+      endLabel:'2026-11-24T17:59'
+    },
+    phaseTwo: {
+      version:'Version 7.2 · Phase 2',
+      names:['Zibai','Linnea'],
+      fiveStars:['Zibai','Linnea'],
+      fourStars:['Illuga','Aino','Ningguang'],
+      weapons:['Lightbearing Moonshard','Golden Frostbound Oath'],
+      starts:'2026-11-24T18:00',
+      ends:'2026-12-15T15:00',
+      endLabel:'2026-12-15T14:59'
+    }
+  };
+  const SERVER_UTC_OFFSETS = { asia:8, europe:1, america:-5 };
+  const EVENT_SNAPSHOT = [
+    { name:'Stress Block Smashing Project', kind:'Limited-time challenge', end:'2026-11-30T04:00', endLabel:'2026-11-30T03:59', icon:'⚒' },
+    { name:'Genius Invokation TCG · Heated Battle Mode', kind:'Special TCG mode', end:'2026-12-07T04:00', endLabel:'2026-12-07T03:59', icon:'♢' },
+    { name:'Stygian Onslaught', kind:'Combat challenge', end:'2026-12-15T04:00', endLabel:'2026-12-15T03:59', icon:'⚔' }
+  ];
+  const WISH_PLANNER_KEY = 'starglow:wish-planner:v1';
+
+  function selectedServerOffset() {
+    return SERVER_UTC_OFFSETS[$('#bannerServer')?.value || 'asia'] ?? 8;
+  }
+  function serverTimestamp(serverLocalDateTime) {
+    const [datePart, timePart] = serverLocalDateTime.split('T');
+    const [year, month, day] = datePart.split('-').map(Number);
+    const [hour, minute, second=0] = timePart.split(':').map(Number);
+    // Each Genshin region follows its own local server clock; the same phase is not one shared UTC instant.
+    return Date.UTC(year, month - 1, day, hour - selectedServerOffset(), minute, second);
+  }
+  function formatServerDate(serverLocalDateTime) {
+    const [datePart, timePart] = serverLocalDateTime.split('T');
+    const [year, month, day] = datePart.split('-').map(Number);
+    const monthName = new Date(Date.UTC(year, month - 1, day)).toLocaleDateString('en', { month:'short', timeZone:'UTC' });
+    return `${monthName} ${day} · ${timePart}`;
+  }
+  function formatCountdown(serverLocalDateTime) {
+    const seconds = Math.max(0, Math.floor((serverTimestamp(serverLocalDateTime) - Date.now()) / 1000));
+    const days = Math.floor(seconds / 86400);
+    const hours = Math.floor((seconds % 86400) / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    return days ? `${days}d ${hours}h ${minutes}m` : `${hours}h ${minutes}m ${secs}s`;
+  }
+  function bannerCharacterChip(name) {
+    const key = catalogNameKey(name);
+    const character = DATA.characters.find(item => catalogNameKey(item.name) === key || (item.aliases || []).some(alias => catalogNameKey(alias) === key));
+    const art = character ? characterArt(character, 'banner-featured-art') : `<span class="banner-featured-art">${escapeHTML(name.slice(0,1))}</span>`;
+    const info = character ? `${character.element || 'Character'} · ${character.rarity ? `${character.rarity}★` : 'Featured'}` : 'Featured character';
+    return `<div class="banner-featured">${art}<span class="banner-featured-copy"><strong>${escapeHTML(name)}</strong><small>${escapeHTML(info)}</small></span></div>`;
+  }
+  function phaseCard(phase, stateLabel, variant, now) {
+    const targetTime = variant === 'next' ? phase.starts : phase.ends;
+    const targetTimestamp = serverTimestamp(targetTime);
+    const countdownLabel = variant === 'next' ? 'Opens in' : 'Ends in';
+    return `<article class="banner-phase-card ${variant}">
+      <div class="banner-card-top"><span class="banner-phase-tag">${escapeHTML(phase.version)}</span><span class="banner-live-tag">${escapeHTML(stateLabel)}</span></div>
+      <h3>${escapeHTML(phase.names.join(' & '))}</h3>
+      <p class="banner-version">${variant === 'next' ? `Opens ${escapeHTML(formatServerDate(phase.starts))}` : `Closes ${escapeHTML(formatServerDate(phase.endLabel || phase.ends))}`} · server time</p>
+      <div class="banner-featured-list">${phase.fiveStars.map(bannerCharacterChip).join('')}</div>
+      <div class="banner-countdown"><span>${countdownLabel}<br><small>${escapeHTML(formatServerDate(variant === 'next' ? phase.starts : (phase.endLabel || phase.ends)))}</small></span><strong>${now >= targetTimestamp ? (variant === 'next' ? 'Opening' : 'Ended') : formatCountdown(targetTime)}</strong></div>
+    </article>`;
+  }
+  function renderBannerRadar() {
+    const now = Date.now();
+    const p1 = BANNER_SCHEDULE.phaseOne;
+    const p2 = BANNER_SCHEDULE.phaseTwo;
+    const p1End = serverTimestamp(p1.ends);
+    const p2Start = serverTimestamp(p2.starts);
+    const p2End = serverTimestamp(p2.ends);
+    let current = null;
+    let next = null;
+    if (now < p1End) { current = p1; next = p2; }
+    else if (now < p2End) { current = p2; }
+    const cards = [];
+    if (current) cards.push(phaseCard(current, now < p2Start ? 'LIVE NOW' : 'LIVE NOW', 'current', now));
+    if (next) cards.push(phaseCard(next, 'UP NEXT', 'next', now));
+    if (!cards.length) {
+      $('#bannerCards').innerHTML = `<div class="rotation-empty">The published Version 7.2 schedule ended on ${escapeHTML(formatServerDate(p2.ends))}. No later banner schedule is included in this snapshot yet. Check the in-game Events menu or the official notice for the latest announcements.</div>`;
+    } else {
+      $('#bannerCards').innerHTML = cards.join('');
+    }
+  }
+  function renderEventList() {
+    $('#eventList').innerHTML = EVENT_SNAPSHOT.map(item => {
+      const ended = Date.now() >= serverTimestamp(item.end);
+      return `<div class="event-row"><span class="event-icon">${item.icon}</span><span class="event-copy"><strong>${escapeHTML(item.name)}</strong><small>${escapeHTML(item.kind)} · Ends ${escapeHTML(formatServerDate(item.endLabel || item.end))} server time</small></span><span class="event-until">${ended ? 'Ended' : formatCountdown(item.end)}</span></div>`;
+    }).join('');
+  }
+  function loadWishPlanner() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(WISH_PLANNER_KEY) || 'null');
+      if (!saved) return;
+      $('#wishTarget').value = ['Zibai','Linnea','next-featured'].includes(saved.target) ? saved.target : 'Zibai';
+      $('#wishPrimogems').value = Math.max(0, Math.min(999999, Number(saved.primogems) || 0));
+      $('#wishFates').value = Math.max(0, Math.min(9999, Number(saved.fates) || 0));
+      $('#wishPity').value = Math.max(0, Math.min(89, Number(saved.pity) || 0));
+      $('#wishGuaranteed').checked = Boolean(saved.guaranteed);
+    } catch (error) { console.warn('Starglow could not load the saved wish planner:', error); }
+  }
+  function updateWishPlanner() {
+    const primogems = Math.max(0, Math.min(999999, Math.floor(Number($('#wishPrimogems').value) || 0)));
+    const fates = Math.max(0, Math.min(9999, Math.floor(Number($('#wishFates').value) || 0)));
+    const pity = Math.max(0, Math.min(89, Math.floor(Number($('#wishPity').value) || 0)));
+    const guaranteed = $('#wishGuaranteed').checked;
+    const available = Math.floor(primogems / 160) + fates;
+    const needed = guaranteed ? 90 - pity : 180 - pity;
+    const percent = Math.min(100, needed > 0 ? (available / needed) * 100 : 100);
+    const target = $('#wishTarget').value;
+    $('#wishPityValue').textContent = pity;
+    $('#wishAvailable').textContent = available.toLocaleString();
+    $('#wishNeeded').textContent = needed.toLocaleString();
+    $('#wishProgress').style.width = `${percent}%`;
+    let message;
+    if (available >= needed) message = `You have enough pulls for the theoretical hard-pity guarantee on ${target === 'next-featured' ? 'the next featured 5★' : target} (${needed} pulls). This is a worst-case planning estimate, not a promise of the exact pull result.`;
+    else message = `You are ${needed - available} pulls short of the worst-case guarantee for ${target === 'next-featured' ? 'the next featured 5★' : target}. Keep saving — your current pity is included.`;
+    $('#wishMessage').textContent = message;
+    try { localStorage.setItem(WISH_PLANNER_KEY, JSON.stringify({ target, primogems, fates, pity, guaranteed })); }
+    catch (error) { console.warn('Starglow could not save the wish planner:', error); }
+  }
+  function startBannerClock() {
+    const server = $('#bannerServer');
+    try {
+      const savedServer = localStorage.getItem('starglow:banner-server');
+      if (savedServer && SERVER_UTC_OFFSETS[savedServer] !== undefined) server.value = savedServer;
+    } catch { /* local storage may be disabled */ }
+    server.addEventListener('change', () => {
+      try { localStorage.setItem('starglow:banner-server', server.value); } catch { /* ignore */ }
+      renderBannerRadar(); renderEventList();
+    });
+    ['wishTarget','wishPrimogems','wishFates','wishPity','wishGuaranteed'].forEach(id => {
+      const control = $(`#${id}`);
+      control.addEventListener('input', updateWishPlanner);
+      control.addEventListener('change', updateWishPlanner);
+    });
+    loadWishPlanner(); updateWishPlanner();
+    renderBannerRadar(); renderEventList();
+    window.setInterval(() => { renderBannerRadar(); renderEventList(); }, 1000);
+  }
+
+  function claimDailyReward() {
+    const today = localDateKey();
+    if (localStorage.getItem(DAILY_KEY) === today) { toast('Your daily gift has already been claimed'); return; }
+    localStorage.setItem(DAILY_KEY, today); state.gems += 20; saveState(); renderWallet(); updateDailyButton();
+    toast('Daily gift claimed · +20 Stargems');
+  }
+  function updateDailyButton() {
+    const claimed = localStorage.getItem(DAILY_KEY) === localDateKey();
+    $('#dailyRewardButton').hidden = claimed;
+    $('#dailyClaimedLabel').hidden = !claimed;
+  }
+  function showView(viewId) {
+    $$('.view').forEach(view => view.classList.toggle('active', view.id === viewId));
+    $$('.nav-link').forEach(button => button.classList.toggle('active', button.dataset.view === viewId));
+    window.scrollTo({ top:0, behavior:'smooth' });
+  }
+  function init() {
+    readCatalogCache();
+    applyCachedEnkaPortraitMappings();
+    if (!DATA.characters.length) updateCatalogStatus('Loading the complete character catalog…');
+    else updateCatalogStatus(`Loaded ${DATA.characters.length} characters (122-character baseline + Traveler + Manekin + Manekina). Checking online for new releases and portrait details…`);
+    startBannerClock();
+    $('#showOwnedOnly').checked = false;
+    $('#syncCatalogButton').addEventListener('click', () => syncCharacterCatalog(true));
+    $('#auditPortraitsButton').addEventListener('click', auditAllPortraits);
+    $('#characterSearch').addEventListener('input', renderRoster);
+    $('#elementFilter').addEventListener('change', renderRoster);
+    $('#showOwnedOnly').addEventListener('change', renderRoster);
+    $('#characterGrid').addEventListener('click', event => {
+      const card = event.target.closest('[data-character-id]'); if (!card) return;
+      const id = card.dataset.characterId; setOwned(id, !state.owned.includes(id));
+    });
+    $('#characterGrid').addEventListener('change', event => {
+      const picker = event.target.closest('[data-traveler-element]'); if (!picker) return;
+      setTravelerElement(picker.dataset.travelerElement, picker.value);
+    });
+    $('#mainCharacter').addEventListener('change', renderMainPreview);
+    $('#buildTeamButton').addEventListener('click', buildTeam);
+    $('#screenshotInput').addEventListener('change', async event => {
+      selectedFiles = [...event.target.files].filter(file => file.type.startsWith('image/'));
+      $('#fileList').textContent = formatFileNames(selectedFiles);
+      $('#scanButton').disabled = selectedFiles.length === 0;
+      $('#scanStatus').textContent = 'Choose the grid layout, then prepare manual portrait suggestions.';
+      $('#scanProgress').hidden = true; $('#scanProgressBar').style.width = '0%';
+      $('#portraitScanResults').hidden = true; $('#portraitScanResults').innerHTML='';
+      if(selectedFiles.length) {
+        try { await showPortraitPreview(selectedFiles[0]); }
+        catch(error) { $('#scanStatus').textContent=error.message; $('#scanButton').disabled=true; }
+      } else { $('#portraitScanPanel').hidden=true; portraitPreviewImage=null; }
+    });
+    $('#portraitLayout').addEventListener('change',drawPortraitPreview);
+    $('#portraitColumns').addEventListener('change',drawPortraitPreview);
+    $('#portraitRows').addEventListener('change',drawPortraitPreview);
+    $('#resetPortraitCrop').addEventListener('click',()=>{
+      const canvas=$('#portraitPreviewCanvas'); if(!canvas.width)return;
+      portraitCropRect={x:0,y:0,w:canvas.width,h:canvas.height}; portraitCropWasManuallySet=false; portraitDragCurrent=null; drawPortraitPreview();
+    });
+    const previewCanvas=$('#portraitPreviewCanvas');
+    previewCanvas.addEventListener('pointerdown',event=>{
+      if(!portraitPreviewImage)return;
+      previewCanvas.setPointerCapture(event.pointerId);
+      portraitDragStart=portraitCanvasPoint(event); portraitDragCurrent={x:portraitDragStart.x,y:portraitDragStart.y,w:1,h:1}; drawPortraitPreview();
+    });
+    previewCanvas.addEventListener('pointermove',event=>{
+      if(!portraitDragStart)return;
+      const point=portraitCanvasPoint(event);
+      portraitDragCurrent={x:Math.min(point.x,portraitDragStart.x),y:Math.min(point.y,portraitDragStart.y),w:Math.abs(point.x-portraitDragStart.x),h:Math.abs(point.y-portraitDragStart.y)};
+      drawPortraitPreview();
+    });
+    const finishPortraitCrop=()=>{
+      if(!portraitDragStart)return;
+      if(portraitDragCurrent && portraitDragCurrent.w>12 && portraitDragCurrent.h>12) { portraitCropRect=portraitDragCurrent; portraitCropWasManuallySet=true; }
+      portraitDragStart=null; portraitDragCurrent=null; drawPortraitPreview();
+    };
+    previewCanvas.addEventListener('pointerup',finishPortraitCrop);
+    previewCanvas.addEventListener('pointercancel',finishPortraitCrop);
+    $('#scanButton').addEventListener('click', scanScreenshots);
+    $('#enkaForm').addEventListener('submit', handleEnkaSubmit);
+    $('#modeSelect').addEventListener('change', event => { state.mode = event.target.value; saveState(); applyAppearance(); });
+    $('#accentPicker').addEventListener('click', event => {
+      const button = event.target.closest('[data-accent-choice]'); if (!button) return;
+      state.accent = button.dataset.accentChoice; saveState(); applyAppearance();
+    });
+    $('#themeShopGrid').addEventListener('click', event => {
+      const button = event.target.closest('[data-theme-action]'); if (button) handleThemeAction(button.dataset.themeAction);
+    });
+    $('#dailyRewardButton').addEventListener('click', claimDailyReward);
+    $('#openAtelierFromProfile').addEventListener('click', () => showView('atelierView'));
+    $('#openProfileButton').addEventListener('click', () => showView('profileView'));
+    $$('.nav-link').forEach(button => button.addEventListener('click', () => showView(button.dataset.view)));
+
+    if (state.profile?.data) { $('#uidInput').value = state.profile.uid || ''; renderProfile({ ...state.profile.data, uid:state.profile.uid }); }
+    applyAppearance(); renderRoster(); renderShop(); updateDailyButton();
+    // Refresh exact forward-facing asset names independently from the catalog's 12-hour schedule.
+    enrichWithEnkaIconManifest().then(mapped => {
+      if (mapped > 0) renderRoster();
+    });
+    startCatalogAutoChecks();
+    if (state.lastTeam?.mainId && state.lastTeam.teammateIds?.length === 3) {
+      const restored = ENGINE.buildTeam(state.lastTeam.mainId, state.owned, DATA.characters);
+      if (!restored.error) { currentTeam = restored; renderTeam(restored); }
+    }
+  }
+  ensureBaselineRoster();
+  init();
+})();
+
+  </script>
+</body>
+</html>
