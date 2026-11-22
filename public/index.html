@@ -2100,7 +2100,11 @@ const stamp = new Date(updatedAt).toLocaleString();
     const name = info.nickname || 'Traveler';
     const uid = profile?.uid || state.profile?.uid || '';
     const signature = info.signature || 'No public signature set.';
-    const pictureId = info.profilePicture?.avatarId ? String(info.profilePicture.avatarId) : '';
+    const pictureId = info.profilePicture?.avatarId
+  ? String(info.profilePicture.avatarId)
+  : info.profilePicture?.id
+    ? String(info.profilePicture.id)
+    : '';
     const character = DATA.profileAvatarIds[pictureId];
     $('#profileName').textContent = name;
     $('#profileUid').textContent = uid ? `UID ${uid}` : 'UID NOT CONNECTED';
