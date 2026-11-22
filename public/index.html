@@ -1659,8 +1659,16 @@ window.StarglowEngine = (() => {
         }
         // New characters should be visible immediately so players can mark which ones they own.
         if (result.added > 0) $('#showOwnedOnly').checked = false;
-        renderRoster();
-        const stamp = new Date(updatedAt).toLocaleString();
+       renderRoster();
+
+if (state.profile?.data) {
+  renderProfile({
+    ...state.profile.data,
+    uid: state.profile.uid
+  });
+}
+
+const stamp = new Date(updatedAt).toLocaleString();
         updateCatalogStatus(`Catalog sync complete · ${result.total} characters · ${result.added} new · ${officialPortraits} official portrait mappings refreshed · ${stamp}. Sources: ${catalog.successfulSources.join(' | ')}`);
         if (result.added > 0) toast(`${result.added} new character${result.added === 1 ? '' : 's'} added to the catalog`);
         return result;
